@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Conservation of Blockspace">
+  <rect width="64" height="64" rx="14" fill="#0f172a"/>
+  <path d="M14 18h36v8H14zM14 30h26v8H14zM14 42h16v8H14z" fill="#93c5fd"/>
+  <path d="M44 30h6v20h-6zM34 42h6v8h-6z" fill="#f8fafc"/>
+</svg>

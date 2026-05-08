@@ -1,0 +1,10 @@
+node_modules
+dist
+*.local
+.DS_Store
+._*
+**/._*
+# Tectonic intermediates
+public/cred10.aux
+public/cred10.log
+public/cred10.out
