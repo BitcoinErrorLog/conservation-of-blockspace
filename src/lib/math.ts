@@ -19,10 +19,10 @@ export interface WeightBucket {
 
 export const defaultCoinbaseWeight = 2_000
 
-/** Lightning per-user enforcement weight (wu) — matches paper instantiations. */
+/** Lightning per-user enforcement weight (wu) — declared paper reference profile. */
 export const LN_WEIGHT_WU = {
   idle: 2_360,
-  active: 4_616,
+  active: 5_848,
 } as const
 
 export const ARK_WEIGHT_PER_USER_WU = 3_200
@@ -31,10 +31,14 @@ export const ARK_WEIGHT_PER_USER_WU = 3_200
  * Illustrative single-user enforcement weight (wu) for operator-assisted deferred-settlement stacks.
  * Not a protocol specification — substitute measured footprints when reviewing a concrete design.
  */
-export const SPARK_ILLUSTRATIVE_WEIGHT_WU = 3_400
+export const OPERATOR_ASSISTED_ILLUSTRATIVE_WEIGHT_WU = 3_400
 
-/** Window used for headline Security Slope zones in the paper (≈ one day). */
-export const PAPER_HEADLINE_WINDOW_BLOCKS = 137
+export const FAST_EXIT_WINDOW_BLOCKS = 137
+export const LAYER_BENCHMARK_WINDOW_BLOCKS = 2_016
+export const SLOW_SETTLEMENT_WINDOW_BLOCKS = 4_032
+
+/** Window used for the fast-exit stress envelope in the paper (≈ one day). */
+export const PAPER_HEADLINE_WINDOW_BLOCKS = FAST_EXIT_WINDOW_BLOCKS
 
 export const RHO_STRESS = 0.7
 export const RHO_BEST_CASE = 1.0
@@ -66,6 +70,34 @@ export function nMax(
   return Math.floor(capacity / perUserWeight)
 }
 
+export interface WindowCapacityRow {
+  id: string
+  label: string
+  windowBlocks: number
+  lightningActive: number
+  lightningIdle: number
+  arkStyle: number
+  operatorAssisted: number
+}
+
+export function windowCapacityRows(
+  rho: number = 0.8,
+  wCoinbase: number = defaultCoinbaseWeight,
+): WindowCapacityRow[] {
+  const windows = [
+    { id: 'fast-exit', label: 'Fast exit stress case', windowBlocks: FAST_EXIT_WINDOW_BLOCKS },
+    { id: 'layer-benchmark', label: '14-day layer benchmark', windowBlocks: LAYER_BENCHMARK_WINDOW_BLOCKS },
+    { id: 'slow-settlement', label: '28-day slow settlement runway', windowBlocks: SLOW_SETTLEMENT_WINDOW_BLOCKS },
+  ]
+  return windows.map((window) => ({
+    ...window,
+    lightningActive: nMax(rho, window.windowBlocks, LN_WEIGHT_WU.active, wCoinbase),
+    lightningIdle: nMax(rho, window.windowBlocks, LN_WEIGHT_WU.idle, wCoinbase),
+    arkStyle: nMax(rho, window.windowBlocks, ARK_WEIGHT_PER_USER_WU, wCoinbase),
+    operatorAssisted: nMax(rho, window.windowBlocks, OPERATOR_ASSISTED_ILLUSTRATIVE_WEIGHT_WU, wCoinbase),
+  }))
+}
+
 export function blendedWeight(buckets: WeightBucket[]): number {
   if (!buckets.length) return 0
   const numerator = buckets.reduce((sum, bucket) => sum + bucket.weight * bucket.share, 0)
@@ -74,6 +106,7 @@ export function blendedWeight(buckets: WeightBucket[]): number {
   return numerator / denominator
 }
 
+/** Estimate observed rho from an explicit loss decomposition. This is methodology, not theorem input. */
 export function rhoFromLosses({
   windowBlocks,
   wCoinbase = defaultCoinbaseWeight,
@@ -103,10 +136,10 @@ export function leadTimeBlocks(
 export type SecurityZone = 'safe' | 'probabilistic' | 'insolvent'
 
 /**
- * Paper headline zones at W'=137: lower bound uses active channels at ρ=0.7; upper bound uses idle at ρ=1.
- * This matches the abstract's ~83k–232k envelope (rounded).
+ * Fast-exit envelope at W'=137: lower bound uses active HTLC-stress exits at ρ=0.7;
+ * upper bound uses idle exits at ρ=1. These are different assumptions, not one scenario.
  */
-export function paperHeadlineZoneThresholds(wCoinbase: number = defaultCoinbaseWeight): {
+export function fastExitEnvelopeThresholds(wCoinbase: number = defaultCoinbaseWeight): {
   lowerSimultaneousExits: number
   upperSimultaneousExits: number
 } {
@@ -147,12 +180,12 @@ export function classifySecurityZoneForDemand(
   return 'insolvent'
 }
 
-/** Classify simultaneous exit demand against the paper's headline 1-day Lightning cross-state thresholds. */
-export function classifySecurityZoneHeadline(
+/** Classify simultaneous exit demand against the fast-exit 1-day Lightning cross-state envelope. */
+export function classifyFastExitEnvelope(
   simultaneousExitDemand: number,
   wCoinbase: number = defaultCoinbaseWeight,
 ): SecurityZone {
-  const { lowerSimultaneousExits, upperSimultaneousExits } = paperHeadlineZoneThresholds(wCoinbase)
+  const { lowerSimultaneousExits, upperSimultaneousExits } = fastExitEnvelopeThresholds(wCoinbase)
   return classifySecurityZoneForDemand(
     simultaneousExitDemand,
     lowerSimultaneousExits,
@@ -160,4 +193,4 @@ export function classifySecurityZoneHeadline(
   )
 }
 
-export const TOY_VERSION = '1.8.0'
+export const TOY_VERSION = '1.10.0'

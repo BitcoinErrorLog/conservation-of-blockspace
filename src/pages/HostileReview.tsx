@@ -21,9 +21,8 @@ export function HostileReview() {
       </ReactMarkdown>
       <p className="memo-download">
         <a href={`${import.meta.env.BASE_URL}hostile-review.md`} download>
-          Download hostile-review.md
-        </a>{' '}
-        (same text as <code>docs/HOSTILE_REVIEW.md</code> in the repo).
+          Download the objections memo
+        </a>
       </p>
     </article>
   )

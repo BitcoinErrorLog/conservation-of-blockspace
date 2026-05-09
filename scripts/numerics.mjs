@@ -6,13 +6,16 @@
  */
 
 const W_CB = 2000
-const W_LINE = 137
+const FAST_EXIT_WINDOW = 137
+const LAYER_BENCHMARK_WINDOW = 2_016
+const SLOW_SETTLEMENT_WINDOW = 4_032
 const USABLE_PER_BLOCK = 4_000_000 - W_CB
-const C_MAX_137 = USABLE_PER_BLOCK * W_LINE
+const C_MAX_137 = USABLE_PER_BLOCK * FAST_EXIT_WINDOW
 
-const E_ACTIVE = 4616
+const E_ACTIVE = 5848
 const E_IDLE = 2360
-const E_MIX = 0.5 * E_ACTIVE + 0.5 * E_IDLE
+const E_ARK = 3200
+const E_OPERATOR = 3400
 
 function nMax(rho, windowBlocks, perUserWeight) {
   const cMax = USABLE_PER_BLOCK * windowBlocks
@@ -20,7 +23,28 @@ function nMax(rho, windowBlocks, perUserWeight) {
 }
 
 console.log('C_max(W\'=137) wu:', C_MAX_137)
-console.log('ρ_obs example:', (1 - 160_200_000 / C_MAX_137).toFixed(4))
+console.log('ρ_obs illustrative example:', (1 - 160_200_000 / C_MAX_137).toFixed(4))
+console.log('replacement term share:', (118_400_000 / C_MAX_137).toFixed(4))
+
+console.log('\n--- Primary table: exit capacity by enforcement window (rho=0.8) ---')
+const rho = 0.8
+for (const [label, windowBlocks] of [
+  ['Fast exit stress (~1 day)', FAST_EXIT_WINDOW],
+  ['Layer benchmark (14 days)', LAYER_BENCHMARK_WINDOW],
+  ['Slow settlement (28 days)', SLOW_SETTLEMENT_WINDOW],
+]) {
+  console.log(
+    label,
+    'active',
+    nMax(rho, windowBlocks, E_ACTIVE),
+    'idle',
+    nMax(rho, windowBlocks, E_IDLE),
+    'ark',
+    nMax(rho, windowBlocks, E_ARK),
+    'operator',
+    nMax(rho, windowBlocks, E_OPERATOR),
+  )
+}
 
 console.log('\n--- Table: rho sensitivity (W\'=137) ---')
 for (const [label, rho] of [
@@ -34,28 +58,16 @@ for (const [label, rho] of [
     'rho=',
     rho,
     'active',
-    nMax(rho, W_LINE, E_ACTIVE),
+    nMax(rho, FAST_EXIT_WINDOW, E_ACTIVE),
     'idle',
-    nMax(rho, W_LINE, E_IDLE),
+    nMax(rho, FAST_EXIT_WINDOW, E_IDLE),
   )
 }
 
-console.log('\n--- Table: policy scenarios (rho=0.8) ---')
-const rho = 0.8
-console.log('Retail Panic', nMax(rho, 137, E_ACTIVE))
-console.log('Quiet Exit', nMax(rho, 137, E_IDLE))
-console.log('Mixed Economy', nMax(rho, 432, E_MIX))
-console.log('Institutional', nMax(rho, 2016, E_ACTIVE))
-
-console.log('\n--- Ark-style (e=3200 wu, rho=0.8) ---')
-const E_ARK = 3200
-console.log('1 week (1008 blk)', nMax(rho, 1008, E_ARK))
-console.log('2 week (2016 blk)', nMax(rho, 2016, E_ARK))
-
-console.log('\n--- Reference zones (1-day LN, mixed bounds from paper) ---')
+console.log('\n--- Fast-exit reference envelope (1-day LN, mixed assumptions) ---')
 console.log(
   'Lower (rho=0.7, active):',
-  nMax(0.7, W_LINE, E_ACTIVE),
+  nMax(0.7, FAST_EXIT_WINDOW, E_ACTIVE),
   '| Upper (rho=1.0, idle):',
-  nMax(1.0, W_LINE, E_IDLE),
+  nMax(1.0, FAST_EXIT_WINDOW, E_IDLE),
 )

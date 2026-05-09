@@ -22,10 +22,10 @@ npm run preview      # serve /dist
 |-------|---------|
 | `/` | Guided start page — intuition, core claim, next steps |
 | `/paper` | Embedded full-paper PDF, PDF/TeX downloads, reproducibility pointers |
-| `/toy` | Interactive calculator (ρ, W′, e, demand N, zones) |
+| `/toy` | Interactive calculator (ρ, W′, e, demand N, 1-day / 14-day / 28-day windows) |
 | `/trust-network` | Lightning as a trust network; explicit-trust framing |
-| `/protocols` | Lightning, Ark, Spark-like framing |
-| `/methods` | Definitions, headline vs same-e zones |
+| `/protocols` | Lightning, Ark, factories, BitVM-class, and operator-assisted framing |
+| `/methods` | Definitions, window benchmarks, fast-exit envelope, same-e zones |
 | `/faq` | Short answers |
 | `/objections` | Hostile-read memo for reviewer objections |
 | `/review` | Peer-review checklist + BibTeX stub |
@@ -33,21 +33,30 @@ npm run preview      # serve /dist
 
 ## Toy behavior
 
-- Presets mirror paper scenarios (Lightning, Mixed Economy, Institutional, Ark, Spark-like illustrative weights).
-- **Headline zone** compares exit demand to the paper’s 1-day Lightning envelope (active @ ρ=0.7 vs idle @ ρ=1.0).
+- Presets mirror paper scenarios across the **fast-exit stress case** (137 blocks), **14-day layer benchmark** (2016 blocks), and **28-day slow-settlement runway** (4032 blocks).
+- **Fast-exit envelope** compares exit demand to the paper’s 1-day Lightning envelope (HTLC-stress active @ ρ=0.7 vs idle @ ρ=1.0).
 - **Same-e zone** compares demand to N\_max at ρ∈{0.7, 1.0} for your current per-user weight.
 
-## Estimating ρ (field sketch)
+## Estimating ρ_obs (field sketch)
 
 1. `C_max = (4_000_000 - w_cb) * W′` (wu).
 2. Sum replaced, orphaned, dust, and policy-filtered weight over the window.
-3. `ρ = 1 - losses / C_max`.
+3. `ρ_obs = 1 - losses / C_max`.
+4. Publish the dataset, parser, checksums, and intermediate outputs before treating the estimate as measured.
 
-## Deploy (GitHub Pages)
+## Deploy (Vercel)
 
-Workflow `.github/workflows/deploy.yml` runs tests, `npm run build`, copies `dist/index.html` → `dist/404.html` for client-side routing, then publishes `dist/`.
+The production site is deployed with Vercel. Run the full verification suite before production deploy:
 
-Set `VITE_BASE=/repository-name/` via the workflow env when using project Pages URLs.
+```bash
+npm run numerics
+npm test -- --run
+npm run lint
+npm run build
+vercel --prod --yes
+```
+
+`vercel.json` rewrites all routes to `index.html` for client-side routing.
 
 ## Docs
 

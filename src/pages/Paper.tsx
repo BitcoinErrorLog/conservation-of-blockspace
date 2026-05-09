@@ -7,9 +7,9 @@ export function Paper() {
     <article className="page">
       <h1>Paper</h1>
       <p className="lead">
-        <strong>Credible Exit and the Law of Conservation of Blockspace</strong> — formalizes necessary
-        byte accounting for unilateral exits under stated relay and topology assumptions, with Lightning and
-        Ark-style instantiations and scenario tables.
+        <strong>Credible Exit and the Law of Conservation of Blockspace</strong> — formalizes a necessary
+        finite-window byte-accounting bound for unilateral exits, with 1-day, 14-day, and 28-day window
+        examples.
       </p>
 
       <div className="paper-actions">
@@ -29,24 +29,11 @@ export function Paper() {
         <a href={texHref}>download the TeX source</a>.
       </p>
 
+      <h2>What to look for</h2>
       <p>
-        The readable version above is the compiled PDF, not a LaTeX-to-HTML conversion. That keeps equations,
-        tables, theorem labels, and bibliography rendering faithful to the source.
-      </p>
-
-      <h2>Executable table check</h2>
-      <p>
-        From the repo root run <code>node scripts/numerics.mjs</code> to print figures aligned with Tables 1
-        and 2 and Ark-style examples — same arithmetic as{' '}
-        <code>src/lib/math.ts</code>.
-      </p>
-
-      <h2>Version</h2>
-      <p>
-        Paper front matter lists v1.8.0 (May 2026). The interactive toy tracks a separate{' '}
-        <code>TOY_VERSION</code> string for export metadata when UX or presets change. The build step
-        refreshes <code>public/blockspace-conservation-may-2026.pdf</code> from{' '}
-        <code>blockspace-conservation-may-2026.tex</code> when Tectonic is installed.
+        The key table compares 1-day, 14-day, and 28-day enforcement windows. The proof states a necessary
+        byte-accounting bound; the protocol sections show how Lightning, Ark-style, and operator-assisted
+        designs substitute their own exit weight and window.
       </p>
     </article>
   )

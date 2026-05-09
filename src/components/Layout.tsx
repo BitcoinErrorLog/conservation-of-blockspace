@@ -1,5 +1,4 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { TOY_VERSION } from '../lib/math'
 import '../site.css'
 
 const nav = [
@@ -43,7 +42,7 @@ export function Layout() {
       </main>
       <footer className="site-footer">
         <p>
-          Toy math version {TOY_VERSION} · Static bound, not a mempool simulator.
+          Credible exit is bounded by weight, time, and the assumptions users accept.
         </p>
       </footer>
     </div>

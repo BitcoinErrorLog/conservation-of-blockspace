@@ -10,8 +10,8 @@ export function Methods() {
           ≈ 2,000 wu by default).
         </li>
         <li>
-          <code>ρ</code> — usable fraction of <code>C_max</code> after deadweight loss (RBF, orphans, dust,
-          policy rejects).
+          <code>ρ</code> — model coefficient for the fraction of physical capacity usable by the relevant
+          enforcement packages after relay, policy, fee-bumping, miner selection, and congestion friction.
         </li>
         <li>
           <code>N_max = ⌊ ρ · C_max(W′) / e ⌋</code> — simultaneous exits bound for homogeneous cohort weight{' '}
@@ -19,12 +19,19 @@ export function Methods() {
         </li>
       </ul>
 
-      <h2>Headline security slope bands</h2>
+      <h2>Window benchmarks</h2>
       <p>
-        For the paper&apos;s rounded &quot;~83k–232k&quot; story at <code>W′ = 137</code>: lower threshold uses{' '}
-        <code>ρ = 0.7</code> with <strong>active</strong> Lightning weight; upper uses <code>ρ = 1.0</code>{' '}
-        with <strong>idle</strong> weight. The toy&apos;s &quot;paper headline&quot; classifier compares your
-        demand <code>N</code> to those two floors.
+        The paper uses three named windows: <strong>fast exit</strong> at <code>W′ = 137</code> blocks,{' '}
+        <strong>layer benchmark</strong> at <code>W′ = 2016</code> blocks, and{' '}
+        <strong>slow settlement</strong> at <code>W′ = 4032</code> blocks. The 14-day row is the main
+        cross-layer benchmark; the one-day row is a stress case.
+      </p>
+
+      <h2>Fast-exit envelope</h2>
+      <p>
+        The rounded &quot;~66k–232k&quot; envelope is only the one-day Lightning stress case. Lower threshold uses{' '}
+        <code>ρ = 0.7</code> with <strong>HTLC-stress</strong> Lightning weight; upper uses{' '}
+        <code>ρ = 1.0</code> with <strong>idle</strong> weight.
       </p>
 
       <h2>Scenario bands (same e)</h2>
@@ -34,10 +41,17 @@ export function Methods() {
         holding path weight fixed?&quot;
       </p>
 
-      <h2>Scripts</h2>
+      <h2>Observed ρ</h2>
       <p>
-        Run <code>node scripts/numerics.mjs</code> for table parity. Run <code>npm test</code> for Vitest
-        anchors tied to the same helpers as the UI.
+        <code>ρ_obs</code> can be estimated from an explicit loss decomposition, but the theorem only needs a
+        chosen <code>ρ</code>. Any empirical <code>ρ_obs</code> claim must publish the dataset, parser,
+        checksums, and intermediate results.
+      </p>
+
+      <h2>Reproducibility</h2>
+      <p>
+        The table arithmetic is exposed in the interactive toy, so readers can change the window, efficiency,
+        or per-user exit weight and verify how the ceiling moves.
       </p>
     </article>
   )

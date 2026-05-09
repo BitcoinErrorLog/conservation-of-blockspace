@@ -4,14 +4,18 @@ import '../App.css'
 import {
   TOY_VERSION,
   classifySecurityZoneForDemand,
-  classifySecurityZoneHeadline,
+  classifyFastExitEnvelope,
   cMax,
   defaultCoinbaseWeight,
   effectiveCapacity,
+  FAST_EXIT_WINDOW_BLOCKS,
+  LAYER_BENCHMARK_WINDOW_BLOCKS,
   leadTimeBlocks,
   nMax,
-  paperHeadlineZoneThresholds,
+  fastExitEnvelopeThresholds,
   securitySlopeBandsSameE,
+  SLOW_SETTLEMENT_WINDOW_BLOCKS,
+  windowCapacityRows,
 } from '../lib/math'
 import {
   SCENARIOS,
@@ -66,7 +70,7 @@ const buildCustomScenario = (state: ToyState): Scenario => ({
   ],
 })
 
-const horizonBlocks = [72, 137, 200, 432, 720, 1_008, 2_016]
+const horizonBlocks = [72, FAST_EXIT_WINDOW_BLOCKS, 432, 1_008, LAYER_BENCHMARK_WINDOW_BLOCKS, SLOW_SETTLEMENT_WINDOW_BLOCKS]
 
 const numberFormatter = new Intl.NumberFormat('en-US')
 
@@ -131,11 +135,12 @@ export function BlockspaceToy() {
 
   const { rho, windowBlocks, perUserWeight, wCoinbase } = state
 
-  const headlineZones = useMemo(() => paperHeadlineZoneThresholds(wCoinbase), [wCoinbase])
+  const fastExitEnvelope = useMemo(() => fastExitEnvelopeThresholds(wCoinbase), [wCoinbase])
   const sameEBands = useMemo(
     () => securitySlopeBandsSameE(windowBlocks, perUserWeight, wCoinbase),
     [windowBlocks, perUserWeight, wCoinbase],
   )
+  const benchmarkRows = useMemo(() => windowCapacityRows(0.8, wCoinbase), [wCoinbase])
 
   const stats = useMemo(() => {
     const totalCapacity = cMax(windowBlocks, wCoinbase)
@@ -144,7 +149,7 @@ export function BlockspaceToy() {
     const avgPerBlockCapacity = Math.max(0, (totalCapacity / Math.max(windowBlocks, 1)) || 0)
     const sampleDemand = 50_000
     const minLeadTime = leadTimeBlocks(sampleDemand, perUserWeight, rho, avgPerBlockCapacity)
-    const zoneHeadline = classifySecurityZoneHeadline(exitDemand, wCoinbase)
+    const zoneFastExit = classifyFastExitEnvelope(exitDemand, wCoinbase)
     const zoneSameE = classifySecurityZoneForDemand(
       exitDemand,
       sameEBands.lowerCapacity,
@@ -154,7 +159,7 @@ export function BlockspaceToy() {
       totalCapacity,
       usableCapacity,
       maxUsers,
-      zoneHeadline,
+      zoneFastExit,
       zoneSameE,
       avgPerBlockCapacity,
       sampleDemand,
@@ -211,7 +216,7 @@ export function BlockspaceToy() {
       formulas: {
         cMax: '(4000000 - w_cb) * Wprime',
         nMax: 'floor(rho * cMax(Wprime) / e)',
-        headlineZones:
+        fastExitEnvelope:
           'lower = floor(0.7 * cMax(137) / e_active), upper = floor(1.0 * cMax(137) / e_idle)',
         sameEZones: 'lower = floor(0.7 * cMax(Wprime) / e), upper = floor(1.0 * cMax(Wprime) / e)',
       },
@@ -222,9 +227,9 @@ export function BlockspaceToy() {
         windowBlocks,
         perUserWeight,
         exitDemand,
-        zoneHeadline: stats.zoneHeadline,
+        zoneFastExit: stats.zoneFastExit,
         zoneSameE: stats.zoneSameE,
-        headlineThresholds: headlineZones,
+        fastExitThresholds: fastExitEnvelope,
         sameEBands,
       },
     }
@@ -245,7 +250,7 @@ export function BlockspaceToy() {
         <p className="lede">
           Adjust the efficiency coefficient ρ, usable window W&apos;, and per-user enforcement weight
           e to see the lower bound on simultaneous exits implied by byte accounting. Compare a hypothetical
-          simultaneous exit count to headline and scenario-aware slope bands.
+          simultaneous exit count to the fast-exit envelope and same-weight slope bands.
         </p>
       </header>
 
@@ -253,7 +258,7 @@ export function BlockspaceToy() {
         <div className="panel-header">
           <div>
             <h2>Presets &amp; Inputs</h2>
-            <p>Select a published scenario or tweak the sliders.</p>
+            <p>Select a window benchmark or tweak the sliders.</p>
           </div>
           <div className="panel-actions">
             <button type="button" className="ghost" onClick={shareScenario}>
@@ -339,7 +344,10 @@ export function BlockspaceToy() {
                 updateCustomState({ perUserWeight: Math.max(1, Number(event.target.value)) })
               }
             />
-            <small>LN idle ≈ 2,360 · active ≈ 4,616 · Ark-style ≈ 3,200 · Spark illustrative ≈ 3,400</small>
+            <small>
+              LN idle ≈ 2,360 · HTLC-stress ≈ 5,848 · Ark-style illustrative ≈ 3,200 ·
+              operator-assisted illustrative ≈ 3,400
+            </small>
           </label>
 
           <label className="control">
@@ -372,11 +380,11 @@ export function BlockspaceToy() {
             </p>
           </article>
           <article className="metric-card">
-            <h3>Zone (paper headline)</h3>
-            <p className="metric-value">{zoneCopy[stats.zoneHeadline]}</p>
+            <h3>Zone (fast-exit envelope)</h3>
+            <p className="metric-value">{zoneCopy[stats.zoneFastExit]}</p>
             <p className="metric-hint">
-              Demand vs ≤{numberFormatter.format(headlineZones.lowerSimultaneousExits)} / ≤
-              {numberFormatter.format(headlineZones.upperSimultaneousExits)} (1-day LN cross-state)
+              Demand vs ≤{numberFormatter.format(fastExitEnvelope.lowerSimultaneousExits)} / ≤
+              {numberFormatter.format(fastExitEnvelope.upperSimultaneousExits)} (1-day mixed assumptions)
             </p>
           </article>
           <article className="metric-card">
@@ -423,11 +431,44 @@ export function BlockspaceToy() {
       </section>
 
       <section className="panel">
+        <h2>Window benchmarks</h2>
+        <p className="chart-caption">
+          At ρ=0.8, longer windows move credible exit capacity into the low millions by delaying settlement.
+        </p>
+        <div className="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Window</th>
+                <th>Blocks</th>
+                <th>LN stress</th>
+                <th>LN idle</th>
+                <th>Ark-style</th>
+                <th>Operator-assisted</th>
+              </tr>
+            </thead>
+            <tbody>
+              {benchmarkRows.map((row) => (
+                <tr key={row.id}>
+                  <td>{row.label}</td>
+                  <td>{numberFormatter.format(row.windowBlocks)}</td>
+                  <td>{numberFormatter.format(row.lightningActive)}</td>
+                  <td>{numberFormatter.format(row.lightningIdle)}</td>
+                  <td>{numberFormatter.format(row.arkStyle)}</td>
+                  <td>{numberFormatter.format(row.operatorAssisted)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="panel">
         <h2>Security slope visualized</h2>
         <Chart points={chartPoints} />
         <p className="chart-caption">
           Near {percentFormatter.format(rho)} efficiency for your chosen e, lengthening W&apos;
-          scales N_max roughly linearly. Fee markets do not remove the conservation inequality.
+          scales N_max roughly linearly. The cost is delayed settlement, not new blockspace.
         </p>
         {selectedScenario && (
           <p className="scenario-note">
@@ -446,10 +487,10 @@ export function BlockspaceToy() {
                 Compute C_max = (4,000,000 − w_cb) · W&apos;; w_cb defaults to 2,000 wu.
               </li>
               <li>
-                Sum serialized weight lost to replacements, orphans, dust, and policy filters over the
+                Sum serialized weight lost to replacements, stale blocks, dust, and policy filters over the
                 window.
               </li>
-              <li>ρ = 1 − (losses / C_max). Oct 2025 sample losses ≈ 160.2M wu → ρ ≈ 0.71.</li>
+              <li>ρ_obs = 1 − (losses / C_max). The paper's 160.2M wu example is illustrative.</li>
             </ul>
           </article>
           <article>
@@ -467,7 +508,7 @@ export function BlockspaceToy() {
             <ul>
               <li>Static capacity bound — not a queue simulation.</li>
               <li>
-                Spark-like presets use an illustrative weight — replace with measured footprints for a
+                Operator-assisted presets use an illustrative weight — replace with measured footprints for a
                 specific construction.
               </li>
             </ul>

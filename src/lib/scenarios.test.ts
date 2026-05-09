@@ -4,7 +4,6 @@ import {
   SCENARIOS,
   decodeScenarioPayload,
   encodeScenarioPayload,
-  scenarioEffectiveWeight,
   scenarioFromQueryString,
   scenarioMetrics,
   scenarioToQueryString,
@@ -13,43 +12,41 @@ import {
 const findScenario = (id: string) => SCENARIOS.find((s) => s.id === id)!
 
 describe('scenario metrics', () => {
-  it('recovers the published Retail Panic capacity', () => {
-    const metrics = scenarioMetrics(findScenario('retail-panic'))
-    expect(metrics.effectiveWeight).toBe(4_616)
-    expect(metrics.maxUsers).toBe(94_926)
+  it('recovers the 14-day layer benchmark capacity', () => {
+    const metrics = scenarioMetrics(findScenario('layer-benchmark'))
+    expect(metrics.effectiveWeight).toBe(5_848)
+    expect(metrics.maxUsers).toBe(1_102_594)
   })
 
-  it('computes the blended weight for the mixed economy case', () => {
-    const scenario = findScenario('mixed-economy')
-    const effectiveWeight = scenarioEffectiveWeight(scenario)
-    expect(effectiveWeight).toBe(3_488)
-    const metrics = scenarioMetrics(scenario)
-    expect(metrics.maxUsers).toBe(396_132)
+  it('recovers the fast-exit stress capacity', () => {
+    const metrics = scenarioMetrics(findScenario('fast-exit'))
+    expect(metrics.effectiveWeight).toBe(5_848)
+    expect(metrics.maxUsers).toBe(74_928)
   })
 
-  it('estimates Ark capacities for week-long windows', () => {
-    const metrics = scenarioMetrics(findScenario('ark-week'))
+  it('estimates Ark capacities for 14-day windows', () => {
+    const metrics = scenarioMetrics(findScenario('ark-layer-benchmark'))
     expect(metrics.effectiveWeight).toBe(3_200)
-    expect(metrics.maxUsers).toBe(1_007_496)
+    expect(metrics.maxUsers).toBe(2_014_992)
   })
 
-  it('estimates illustrative Spark-like capacities', () => {
-    const metrics = scenarioMetrics(findScenario('spark-week'))
+  it('estimates illustrative operator-assisted capacities', () => {
+    const metrics = scenarioMetrics(findScenario('operator-layer-benchmark'))
     expect(metrics.effectiveWeight).toBe(3_400)
-    expect(metrics.maxUsers).toBe(948_231)
+    expect(metrics.maxUsers).toBe(1_896_463)
   })
 })
 
 describe('scenario sharing helpers', () => {
   it('roundtrips the encoded payload', () => {
-    const scenario = findScenario('quiet-exit')
+    const scenario = findScenario('fast-exit')
     const encoded = encodeScenarioPayload(scenario)
     const decoded = decodeScenarioPayload(encoded)
     expect(decoded).toEqual(scenario)
   })
 
   it('embeds the payload in a query string that can be read back', () => {
-    const scenario = findScenario('institutional')
+    const scenario = findScenario('layer-benchmark')
     const query = scenarioToQueryString(scenario)
     const restored = scenarioFromQueryString(query)
     expect(restored).toEqual(scenario)

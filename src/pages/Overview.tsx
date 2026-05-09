@@ -7,9 +7,10 @@ export function Overview() {
         <p className="eyebrow">Start here</p>
         <h1>Layers can move payments off-chain. They cannot create more exit room.</h1>
         <p className="lead">
-          Bitcoin scaling debates often ask whether a layer can route more payments. This site asks the
-          stricter question: how many users can enforce their claims on Layer&nbsp;1 inside the same safety
-          window when cooperation fails?
+          Bitcoin scaling debates often ask whether a layer can route more payments.
+          <br />
+          This site asks the stricter question: how many users can enforce their claims on Layer&nbsp;1 inside
+          the same safety window when cooperation fails?
         </p>
         <div className="hero-actions">
           <Link className="button-link" to="/toy">
@@ -29,8 +30,8 @@ export function Overview() {
           <span className="step-number">1</span>
           <h2>The payment moves off-chain.</h2>
           <p>
-            Lightning, Ark, Spark, factories, and federations can defer, batch, net, or coordinate payment
-            activity outside the base chain.
+            Lightning, Ark, factories, and operator-assisted systems can defer, batch, net, or coordinate
+            payment activity outside the base chain.
           </p>
         </article>
         <article className="story-card">
@@ -66,20 +67,19 @@ export function Overview() {
 
       <section className="split-section">
         <div>
-          <h2>Lightning still works. The story changes.</h2>
+          <h2>The window is the tradeoff.</h2>
           <p>
-            The point is not that Lightning, Ark, or Spark are useless. The point is that their safety model is
-            conditional on a shared Layer&nbsp;1 envelope. Above the envelope, cooperation, operators,
-            liquidity, policy, and reputation do real work. That is trust, and good design should make it
-            explicit.
+            One day is the fast-exit stress case. Fourteen days is the main cross-layer benchmark. Twenty-eight
+            days is the slow-settlement runway. Layers scale credible exit by stretching time, not by creating
+            more blockspace.
           </p>
         </div>
         <div className="number-card">
-          <p className="eyebrow">One-day Lightning reference</p>
-          <strong>~83k to ~232k</strong>
+          <p className="eyebrow">14-day layer benchmark</p>
+          <strong>~1.1M to ~2.7M</strong>
           <span>
-            simultaneous exits, depending on channel state and relay efficiency. Longer windows buy time, not
-            more blockspace.
+            simultaneous Lightning exits at ρ=0.8, depending on active stress versus idle profile. Different
+            protocols substitute their own e.
           </span>
         </div>
       </section>
@@ -97,11 +97,11 @@ export function Overview() {
           </Link>
           <Link to="/protocols" className="journey-card">
             <strong>3. Compare rails</strong>
-            <span>Lightning, Ark, Spark, factories, and federations through the same enforcement lens.</span>
+            <span>Lightning, Ark, factories, and operator-assisted systems through the same enforcement lens.</span>
           </Link>
           <Link to="/paper" className="journey-card">
             <strong>4. Read the paper</strong>
-            <span>Full compiled PDF, TeX source, and reproducible table checks.</span>
+            <span>Full paper, window tables, and protocol assumptions.</span>
           </Link>
         </div>
       </section>

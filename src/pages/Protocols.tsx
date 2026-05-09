@@ -27,21 +27,21 @@ export function Protocols() {
               <td>Channel updates, routing, liquidity coordination.</td>
               <td>Force close plus HTLC claims before <code>to_self_delay</code>.</td>
               <td>LSP liquidity, routing reliability, watchtower/peer uptime, policy defaults.</td>
-              <td><code>e</code> grows with HTLC state; <code>W′</code> is often short.</td>
+              <td><code>e</code> grows with HTLC state; compare 1-day stress to 14-day benchmark.</td>
             </tr>
             <tr>
               <td>Ark-style</td>
               <td>ASP rounds, cooperative exits, refreshes.</td>
               <td>Timeout-tree claims with user-specific leaves.</td>
               <td>ASP availability, round participation, refresh timing, exit windows.</td>
-              <td>Use Ark presets, then replace <code>e</code> with measured path weight.</td>
+              <td>Use 14- or 28-day presets, then replace <code>e</code> with measured path weight.</td>
             </tr>
             <tr>
-              <td>Spark-like</td>
-              <td>Operator-assisted cooperative payment flow.</td>
+              <td>Operator-assisted</td>
+              <td>Cooperative payment flow coordinated by named services or signers.</td>
               <td>Protocol-specific L1 enforcement path under operator failure or dispute.</td>
               <td>Operator signing, availability, fallback policy, challenge/exit mechanics.</td>
-              <td>Illustrative <code>e</code>; substitute concrete witness budget.</td>
+              <td>Illustrative <code>e</code>; substitute concrete witness budget and window.</td>
             </tr>
             <tr>
               <td>Factories</td>
@@ -51,7 +51,7 @@ export function Protocols() {
               <td>Model as a custom cohort once branch weights are specified.</td>
             </tr>
             <tr>
-              <td>Federations / BitVM</td>
+              <td>Federations / BitVM-class</td>
               <td>Operator or quorum-managed cooperative flow.</td>
               <td>Challenge, peg-out, or proof path with its own window.</td>
               <td>Named operators, quorum assumptions, challenge timing.</td>
@@ -69,7 +69,7 @@ export function Protocols() {
         </article>
         <article className="story-card">
           <h3>Measure the rare path</h3>
-          <p>Each protocol must supply its own <code>e</code>, window, package policy, and failure assumptions.</p>
+          <p>Each protocol must supply its own <code>e</code>, <code>W′</code>, package policy, and failure assumptions.</p>
         </article>
         <article className="story-card">
           <h3>Name the coordinator</h3>

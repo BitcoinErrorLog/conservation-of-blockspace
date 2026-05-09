@@ -1,9 +1,12 @@
 import {
   ARK_WEIGHT_PER_USER_WU,
   blendedWeight,
+  FAST_EXIT_WINDOW_BLOCKS,
+  LAYER_BENCHMARK_WINDOW_BLOCKS,
   LN_WEIGHT_WU,
   nMax,
-  SPARK_ILLUSTRATIVE_WEIGHT_WU,
+  OPERATOR_ASSISTED_ILLUSTRATIVE_WEIGHT_WU,
+  SLOW_SETTLEMENT_WINDOW_BLOCKS,
 } from './math'
 
 export interface Cohort {
@@ -33,30 +36,55 @@ export const LN_WEIGHTS = LN_WEIGHT_WU
 
 export const ARK_WEIGHT = ARK_WEIGHT_PER_USER_WU
 
-export const SPARK_WEIGHT = SPARK_ILLUSTRATIVE_WEIGHT_WU
+export const OPERATOR_ASSISTED_ILLUSTRATIVE_WEIGHT = OPERATOR_ASSISTED_ILLUSTRATIVE_WEIGHT_WU
 
 export const SCENARIOS: Scenario[] = [
   {
-    id: 'retail-panic',
-    name: 'Retail Panic',
-    description: '1-day window, active Lightning users under stress',
+    id: 'layer-benchmark',
+    name: '14-Day Layer Benchmark',
+    description: 'Main cross-layer benchmark: 2016-block window, Lightning HTLC-stress profile',
     rho: 0.8,
-    windowBlocks: 137,
+    windowBlocks: LAYER_BENCHMARK_WINDOW_BLOCKS,
     cohorts: [
       {
         id: 'active',
-        label: 'Active channels',
+        label: 'HTLC-stress active channels',
         perUserWeight: LN_WEIGHT_WU.active,
         share: 1,
       },
     ],
   },
   {
-    id: 'quiet-exit',
-    name: 'Quiet Exit',
-    description: '1-day window, mostly idle Lightning users',
+    id: 'fast-exit',
+    name: 'Fast Exit Stress',
+    description: '137-block one-day stress case, Lightning HTLC-stress profile',
     rho: 0.8,
-    windowBlocks: 137,
+    windowBlocks: FAST_EXIT_WINDOW_BLOCKS,
+    cohorts: [
+      {
+        id: 'active',
+        label: 'HTLC-stress active channels',
+        perUserWeight: LN_WEIGHT_WU.active,
+        share: 1,
+      },
+    ],
+  },
+  {
+    id: 'slow-settlement',
+    name: '28-Day Slow Settlement',
+    description: 'Slow-settlement runway: 4032-block window, Lightning HTLC-stress profile',
+    rho: 0.8,
+    windowBlocks: SLOW_SETTLEMENT_WINDOW_BLOCKS,
+    cohorts: [
+      { id: 'active', label: 'HTLC-stress active channels', perUserWeight: LN_WEIGHT_WU.active, share: 1 },
+    ],
+  },
+  {
+    id: 'layer-benchmark-idle',
+    name: '14-Day Idle Lightning',
+    description: '2016-block window, idle Lightning profile',
+    rho: 0.8,
+    windowBlocks: LAYER_BENCHMARK_WINDOW_BLOCKS,
     cohorts: [
       {
         id: 'idle',
@@ -67,37 +95,11 @@ export const SCENARIOS: Scenario[] = [
     ],
   },
   {
-    id: 'mixed-economy',
-    name: 'Mixed Economy',
-    description: '3-day window with 50/50 active-idle blend',
+    id: 'ark-layer-benchmark',
+    name: 'Ark-style (14 Days)',
+    description: 'Illustrative Ark-style timeout tree with 14-day window',
     rho: 0.8,
-    windowBlocks: 432,
-    cohorts: [
-      { id: 'active', label: 'Active channels', perUserWeight: LN_WEIGHT_WU.active, share: 0.5 },
-      { id: 'idle', label: 'Idle channels', perUserWeight: LN_WEIGHT_WU.idle, share: 0.5 },
-    ],
-  },
-  {
-    id: 'institutional',
-    name: 'Institutional',
-    description: '2-week window, active Lightning users',
-    rho: 0.8,
-    windowBlocks: 2_016,
-    cohorts: [
-      {
-        id: 'active',
-        label: 'Active channels',
-        perUserWeight: LN_WEIGHT_WU.active,
-        share: 1,
-      },
-    ],
-  },
-  {
-    id: 'ark-week',
-    name: 'Ark (1 Week)',
-    description: 'Ark-style timeout tree with 1-week window (paper-style e)',
-    rho: 0.8,
-    windowBlocks: 1_008,
+    windowBlocks: LAYER_BENCHMARK_WINDOW_BLOCKS,
     cohorts: [
       {
         id: 'ark-leaf',
@@ -108,11 +110,11 @@ export const SCENARIOS: Scenario[] = [
     ],
   },
   {
-    id: 'ark-fortnight',
-    name: 'Ark (2 Weeks)',
-    description: 'Ark-style timeout tree with 2-week window',
+    id: 'ark-slow-settlement',
+    name: 'Ark-style (28 Days)',
+    description: 'Illustrative Ark-style timeout tree with 28-day window',
     rho: 0.8,
-    windowBlocks: 2_016,
+    windowBlocks: SLOW_SETTLEMENT_WINDOW_BLOCKS,
     cohorts: [
       {
         id: 'ark-leaf',
@@ -123,32 +125,32 @@ export const SCENARIOS: Scenario[] = [
     ],
   },
   {
-    id: 'spark-week',
-    name: 'Spark-like (1 Week)',
+    id: 'operator-layer-benchmark',
+    name: 'Operator-assisted (14 Days)',
     description:
       'Illustrative operator-assisted stack: substitute measured per-user enforcement weight for your design',
     rho: 0.8,
-    windowBlocks: 1_008,
+    windowBlocks: LAYER_BENCHMARK_WINDOW_BLOCKS,
     cohorts: [
       {
-        id: 'spark-exit',
+        id: 'operator-exit',
         label: 'Illustrative per-user L1 footprint',
-        perUserWeight: SPARK_ILLUSTRATIVE_WEIGHT_WU,
+        perUserWeight: OPERATOR_ASSISTED_ILLUSTRATIVE_WEIGHT_WU,
         share: 1,
       },
     ],
   },
   {
-    id: 'spark-fortnight',
-    name: 'Spark-like (2 Weeks)',
-    description: 'Same illustrative weight with a longer safety window',
+    id: 'operator-slow-settlement',
+    name: 'Operator-assisted (28 Days)',
+    description: 'Same illustrative weight with a slow-settlement window',
     rho: 0.8,
-    windowBlocks: 2_016,
+    windowBlocks: SLOW_SETTLEMENT_WINDOW_BLOCKS,
     cohorts: [
       {
-        id: 'spark-exit',
+        id: 'operator-exit',
         label: 'Illustrative per-user L1 footprint',
-        perUserWeight: SPARK_ILLUSTRATIVE_WEIGHT_WU,
+        perUserWeight: OPERATOR_ASSISTED_ILLUSTRATIVE_WEIGHT_WU,
         share: 1,
       },
     ],

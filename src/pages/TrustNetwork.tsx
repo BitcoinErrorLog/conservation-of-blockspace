@@ -94,8 +94,8 @@ export function TrustNetwork() {
           <h2>Every L2 has the same pattern</h2>
           <p>
             Common path: cooperation. Rare path: unilateral enforcement. Lightning has liquidity and uptime
-            assumptions. Ark has ASP rounds and refresh windows. Spark-like systems have operator signatures
-            and cooperative flow. Federations and BitVM systems have named operators, quorums, and challenge
+            assumptions. Ark has ASP rounds and refresh windows. Operator-assisted systems have signatures and
+            cooperative flow. Federations and BitVM-class systems have named operators, quorums, and challenge
             windows.
           </p>
         </div>

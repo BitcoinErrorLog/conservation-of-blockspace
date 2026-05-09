@@ -7,7 +7,8 @@ Use this index to navigate the standalone paper, interactive toy, tests, and dep
 | Path | Role |
 |------|------|
 | [`blockspace-conservation-may-2026.tex`](../blockspace-conservation-may-2026.tex) | Canonical LaTeX source: *Credible Exit and the Law of Conservation of Blockspace* |
-| [`scripts/numerics.mjs`](../scripts/numerics.mjs) | Reproduces Table 1 and Table 2 figures from the paper (Node, no deps) |
+| [`scripts/numerics.mjs`](../scripts/numerics.mjs) | Reproduces the 1-day / 14-day / 28-day window tables from the paper (Node, no deps) |
+| [`blockspace-conservation-audit-may-2026.md`](../blockspace-conservation-audit-may-2026.md) | Audit memo that drove the v1.9 proof, citation, and site consistency revision |
 | [`scripts/prepare-public.mjs`](../scripts/prepare-public.mjs) | Copies TeX/memo assets and compiles `public/blockspace-conservation-may-2026.pdf` when Tectonic is available |
 | [`public/blockspace-conservation-may-2026.pdf`](../public/blockspace-conservation-may-2026.pdf) | Browser-readable/downloadable compiled paper |
 
@@ -19,8 +20,8 @@ Use this index to navigate the standalone paper, interactive toy, tests, and dep
 | [`src/App.tsx`](../src/App.tsx) | React Router routes |
 | [`src/pages/`](../src/pages/) | Start, Trust Network, Paper, Toy, Protocols, Methods, FAQ, Review packet, References |
 | [`src/components/BlockspaceToy.tsx`](../src/components/BlockspaceToy.tsx) | Calculator UI (presets, sliders, export) |
-| [`src/lib/math.ts`](../src/lib/math.ts) | `C_max`, `ρ`, `N_max`, zones, lead time |
-| [`src/lib/scenarios.ts`](../src/lib/scenarios.ts) | Presets: Lightning, Ark, Spark (illustrative) |
+| [`src/lib/math.ts`](../src/lib/math.ts) | `C_max`, model `ρ`, illustrative `ρ_obs`, `N_max`, named window constants, envelope zones, lead time |
+| [`src/lib/scenarios.ts`](../src/lib/scenarios.ts) | Presets: fast exit, 14-day benchmark, 28-day slow settlement, Ark, operator-assisted illustrative weights |
 
 ## Tests and CI
 
@@ -28,7 +29,7 @@ Use this index to navigate the standalone paper, interactive toy, tests, and dep
 |------|------|
 | [`src/lib/*.test.ts`](../src/lib/) | Vitest: numeric anchors matching paper tables |
 | [`vite.config.ts`](../vite.config.ts) | Vitest jsdom |
-| [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) | GitHub Pages: test → build → deploy `dist/` |
+| [`vercel.json`](../vercel.json) | Vercel SPA route rewrites |
 
 ## Build output
 
