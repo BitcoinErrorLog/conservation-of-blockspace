@@ -51,11 +51,11 @@ export function ReviewPacket() {
 
       <h2>BibTeX (minimal)</h2>
       <pre className="equation" style={{ whiteSpace: 'pre-wrap' }}>
-        {`@misc{carvalho2025conservation,
+        {`@misc{carvalho2026conservation,
   title={Credible Exit and the Law of Conservation of Blockspace},
   author={Carvalho, John},
-  year={2025},
-  note={Manuscript v1.8.0; source cred10.tex}
+  year={2026},
+  note={Manuscript v1.8.0; source blockspace-conservation-may-2026.tex}
 }`}
       </pre>
     </article>

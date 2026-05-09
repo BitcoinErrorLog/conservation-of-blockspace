@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Reproduces numeric tables from cred10.tex (Law of Conservation of Blockspace).
+ * Reproduces numeric tables from blockspace-conservation-may-2026.tex.
  * Run: node scripts/numerics.mjs
  * No dependencies — verify against src/lib/math.ts (same formulas).
  */

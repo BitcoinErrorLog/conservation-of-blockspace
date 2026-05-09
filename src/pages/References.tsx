@@ -4,7 +4,8 @@ export function References() {
       <h1>References &amp; further reading</h1>
       <p className="lead">
         The paper&apos;s bibliography cites Lightning, Flood&amp;Loot, mass-exit simulations, Ark, BIP-431,
-        mempool tooling, and queueing texts. Key URLs are inlined in <code>cred10.tex</code>.
+        mempool tooling, and queueing texts. Key URLs are inlined in{' '}
+        <code>blockspace-conservation-may-2026.tex</code>.
       </p>
 
       <h2>Reproducibility</h2>
@@ -18,8 +19,9 @@ export function References() {
           response framing.
         </li>
         <li>
-          <code>public/cred10.pdf</code> is compiled from <code>cred10.tex</code> so the site can render the
-          full paper without converting LaTeX to HTML.
+          <code>public/blockspace-conservation-may-2026.pdf</code> is compiled from{' '}
+          <code>blockspace-conservation-may-2026.tex</code> so the site can render the full paper without
+          converting LaTeX to HTML.
         </li>
       </ul>
     </article>

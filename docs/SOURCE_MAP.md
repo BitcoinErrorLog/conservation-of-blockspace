@@ -6,10 +6,10 @@ Use this index to navigate the standalone paper, interactive toy, tests, and dep
 
 | Path | Role |
 |------|------|
-| [`cred10.tex`](../cred10.tex) | LaTeX source: *Credible Exit and the Law of Conservation of Blockspace* |
+| [`blockspace-conservation-may-2026.tex`](../blockspace-conservation-may-2026.tex) | Canonical LaTeX source: *Credible Exit and the Law of Conservation of Blockspace* |
 | [`scripts/numerics.mjs`](../scripts/numerics.mjs) | Reproduces Table 1 and Table 2 figures from the paper (Node, no deps) |
-| [`scripts/prepare-public.mjs`](../scripts/prepare-public.mjs) | Copies TeX/memo assets and compiles `public/cred10.pdf` when Tectonic is available |
-| [`public/cred10.pdf`](../public/cred10.pdf) | Browser-readable/downloadable compiled paper |
+| [`scripts/prepare-public.mjs`](../scripts/prepare-public.mjs) | Copies TeX/memo assets and compiles `public/blockspace-conservation-may-2026.pdf` when Tectonic is available |
+| [`public/blockspace-conservation-may-2026.pdf`](../public/blockspace-conservation-may-2026.pdf) | Browser-readable/downloadable compiled paper |
 
 ## Interactive toy (Vite + React)
 

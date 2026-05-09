@@ -1,7 +1,7 @@
 export function Paper() {
   const base = import.meta.env.BASE_URL || '/'
-  const texHref = `${base}cred10.tex`
-  const pdfHref = `${base}cred10.pdf`
+  const texHref = `${base}blockspace-conservation-may-2026.tex`
+  const pdfHref = `${base}blockspace-conservation-may-2026.pdf`
 
   return (
     <article className="page">
@@ -43,9 +43,10 @@ export function Paper() {
 
       <h2>Version</h2>
       <p>
-        Paper front matter lists v1.8.0 (Nov 2025). The interactive toy tracks a separate{' '}
+        Paper front matter lists v1.8.0 (May 2026). The interactive toy tracks a separate{' '}
         <code>TOY_VERSION</code> string for export metadata when UX or presets change. The build step
-        refreshes <code>public/cred10.pdf</code> from <code>cred10.tex</code> when Tectonic is installed.
+        refreshes <code>public/blockspace-conservation-may-2026.pdf</code> from{' '}
+        <code>blockspace-conservation-may-2026.tex</code> when Tectonic is installed.
       </p>
     </article>
   )

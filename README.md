@@ -1,6 +1,6 @@
 # Conservation of Blockspace — paper + interactive microsite
 
-This repository contains **LaTeX source** for *Credible Exit and the Law of Conservation of Blockspace* (`cred10.tex`), a **Vite + React** microsite (overview, methods, FAQ, review packet), and the **blockspace toy** used to reproduce scenario tables.
+This repository contains **LaTeX source** for *Credible Exit and the Law of Conservation of Blockspace* (`blockspace-conservation-may-2026.tex`), a **Vite + React** microsite (overview, methods, FAQ, review packet), and the **blockspace toy** used to reproduce scenario tables.
 
 ## Quick start
 
@@ -9,12 +9,12 @@ npm install
 npm run dev          # local dev server
 npm run test -- --run
 npm run numerics     # print numeric tables (same math as the paper)
-npm run paper:pdf    # compile public/cred10.pdf with Tectonic
+npm run paper:pdf    # compile public/blockspace-conservation-may-2026.pdf with Tectonic
 npm run build        # prepares public assets, then tsc + vite build
 npm run preview      # serve /dist
 ```
 
-`npm run build` runs `prebuild`, which copies `cred10.tex` and `docs/HOSTILE_REVIEW.md` into `public/`, and compiles `public/cred10.pdf` when `tectonic` is installed. If Tectonic is unavailable, the build requires an existing `public/cred10.pdf` so the Paper page never ships without a readable document.
+`npm run build` runs `prebuild`, which copies `blockspace-conservation-may-2026.tex` and `docs/HOSTILE_REVIEW.md` into `public/`, and compiles `public/blockspace-conservation-may-2026.pdf` when `tectonic` is installed. If Tectonic is unavailable, the build requires an existing `public/blockspace-conservation-may-2026.pdf` so the Paper page never ships without a readable document.
 
 ## Site map
 

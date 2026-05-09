@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "prebuild": "node scripts/prepare-public.mjs",
-    "paper:pdf": "tectonic --outdir public cred10.tex",
+    "paper:pdf": "tectonic --outdir public blockspace-conservation-may-2026.tex",
     "numerics": "node scripts/numerics.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
