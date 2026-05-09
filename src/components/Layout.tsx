@@ -3,11 +3,12 @@ import { TOY_VERSION } from '../lib/math'
 import '../site.css'
 
 const nav = [
-  { to: '/', label: 'Overview' },
-  { to: '/paper', label: 'Paper' },
+  { to: '/', label: 'Start' },
   { to: '/toy', label: 'Toy' },
+  { to: '/trust-network', label: 'Trust Network' },
   { to: '/protocols', label: 'Protocols' },
   { to: '/methods', label: 'Methods' },
+  { to: '/paper', label: 'Paper' },
   { to: '/faq', label: 'FAQ' },
   { to: '/objections', label: 'Objections' },
   { to: '/review', label: 'Review packet' },

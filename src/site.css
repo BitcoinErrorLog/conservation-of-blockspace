@@ -120,6 +120,145 @@
   max-width: 720px;
 }
 
+.hero {
+  padding: 2.25rem;
+  border: 1px solid #dbeafe;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.14), transparent 38%),
+    #ffffff;
+  box-shadow: 0 18px 55px rgba(15, 23, 42, 0.08);
+}
+
+.hero h1 {
+  max-width: 840px;
+  font-size: clamp(2.25rem, 7vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.story-grid,
+.journey-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.story-card,
+.journey-card,
+.number-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 1.25rem;
+  background: #fff;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.05);
+}
+
+.story-card h2,
+.story-card h3 {
+  margin-top: 0.4rem;
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 800;
+}
+
+.equation-callout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+}
+
+.split-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(240px, 0.6fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.number-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #0f172a;
+}
+
+.number-card strong {
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1.05;
+}
+
+.number-card span,
+.number-card .eyebrow {
+  color: #cbd5e1;
+}
+
+.journey-card {
+  color: inherit !important;
+  text-decoration: none;
+}
+
+.journey-card strong,
+.journey-card span {
+  display: block;
+}
+
+.journey-card span {
+  margin-top: 0.4rem;
+  color: #64748b;
+}
+
+.comparison-table {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.05);
+}
+
+.comparison-table table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.comparison-table th,
+.comparison-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.9rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.comparison-table th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  background: #f8fafc;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: 0;
+}
+
 .callout {
   border-left: 4px solid #1d4ed8;
   padding: 0.75rem 1rem;
@@ -182,6 +321,25 @@
   padding: 1rem 1.25rem;
   border-radius: 12px;
   overflow-x: auto;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #1d4ed8;
+}
+
+@media (max-width: 780px) {
+  .hero {
+    padding: 1.35rem;
+  }
+
+  .equation-callout,
+  .split-section {
+    grid-template-columns: 1fr;
+  }
 }
 
 .memo-markdown h1 {

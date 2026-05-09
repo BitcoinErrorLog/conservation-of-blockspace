@@ -17,7 +17,7 @@ Use this index to navigate the standalone paper, interactive toy, tests, and dep
 |------|------|
 | [`src/main.tsx`](../src/main.tsx) | Entry |
 | [`src/App.tsx`](../src/App.tsx) | React Router routes |
-| [`src/pages/`](../src/pages/) | Overview, Paper, Toy, Protocols, Methods, FAQ, Review packet, References |
+| [`src/pages/`](../src/pages/) | Start, Trust Network, Paper, Toy, Protocols, Methods, FAQ, Review packet, References |
 | [`src/components/BlockspaceToy.tsx`](../src/components/BlockspaceToy.tsx) | Calculator UI (presets, sliders, export) |
 | [`src/lib/math.ts`](../src/lib/math.ts) | `C_max`, `ρ`, `N_max`, zones, lead time |
 | [`src/lib/scenarios.ts`](../src/lib/scenarios.ts) | Presets: Lightning, Ark, Spark (illustrative) |

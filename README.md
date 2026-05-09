@@ -20,9 +20,10 @@ npm run preview      # serve /dist
 
 | Route | Content |
 |-------|---------|
-| `/` | Overview — claim + navigation |
+| `/` | Guided start page — intuition, core claim, next steps |
 | `/paper` | Embedded full-paper PDF, PDF/TeX downloads, reproducibility pointers |
 | `/toy` | Interactive calculator (ρ, W′, e, demand N, zones) |
+| `/trust-network` | Lightning as a trust network; explicit-trust framing |
 | `/protocols` | Lightning, Ark, Spark-like framing |
 | `/methods` | Definitions, headline vs same-e zones |
 | `/faq` | Short answers |
