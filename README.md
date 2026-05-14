@@ -35,7 +35,7 @@ npm run preview      # serve /dist
 
 - Presets mirror paper scenarios across the **fast-exit stress case** (137 blocks), **14-day layer benchmark** (2016 blocks), and **28-day slow-settlement runway** (4032 blocks).
 - **Fast-exit envelope** compares exit demand to the paper’s 1-day Lightning envelope (HTLC-stress active @ ρ=0.7 vs idle @ ρ=1.0).
-- **Same-e zone** compares demand to N\_max at ρ∈{0.7, 1.0} for your current per-user weight.
+- **Same-e zone** compares demand to N\_max at ρ∈{0.7, 1.0} for your current per-exit-unit weight.
 
 ## Estimating ρ_obs (field sketch)
 

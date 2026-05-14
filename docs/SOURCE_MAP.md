@@ -21,7 +21,7 @@ Use this index to navigate the standalone paper, interactive toy, tests, and dep
 | [`src/pages/`](../src/pages/) | Start, Trust Network, Paper, Toy, Protocols, Methods, FAQ, Review packet, References |
 | [`src/components/BlockspaceToy.tsx`](../src/components/BlockspaceToy.tsx) | Calculator UI (presets, sliders, export) |
 | [`src/lib/math.ts`](../src/lib/math.ts) | `C_max`, model `ρ`, illustrative `ρ_obs`, `N_max`, named window constants, envelope zones, lead time |
-| [`src/lib/scenarios.ts`](../src/lib/scenarios.ts) | Presets: fast exit, 14-day benchmark, 28-day slow settlement, Ark, operator-assisted illustrative weights |
+| [`src/lib/scenarios.ts`](../src/lib/scenarios.ts) | Presets: fast exit, 14-day benchmark, 28-day slow settlement, Ark-style templates, operator-assisted templates |
 
 ## Tests and CI
 

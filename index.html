@@ -11,7 +11,7 @@
     <meta property="og:title" content="Conservation of Blockspace" />
     <meta
       property="og:description"
-      content="Static byte-accounting bound for unilateral L1 enforcement across 1-day, 14-day, and 28-day windows."
+      content="Static block-weight accounting bound for unilateral L1 enforcement across 1-day, 14-day, and 28-day windows."
     />
     <meta property="og:type" content="website" />
     <meta name="theme-color" content="#0f172a" />
@@ -19,6 +19,60 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <main style="max-width: 760px; margin: 48px auto; padding: 0 24px; font-family: Helvetica, Arial, sans-serif; color: #111; line-height: 1.55;">
+        <h1 style="font-size: 42px; line-height: 1.05; margin: 0 0 16px;">Credible Exit and the Law of Conservation of Blockspace</h1>
+        <p>
+          Bitcoin layers can increase cooperative payment throughput, but their non-custodial safety still depends
+          on the base layer when users must enforce without cooperation. Layers can move settlement demand through
+          time, coordination, and trust. They cannot create more unilateral enforcement blockspace.
+        </p>
+        <p>
+          The model counts exit units: unilateral enforcement traces. Human users, wallets, channels, VTXOs, or
+          accounts map onto those traces according to protocol topology. The core bound is:
+        </p>
+        <pre style="padding: 16px; overflow-x: auto; background: #111; color: #f4f4f1;">Σᵢ Nᵢ eᵢ ≤ ρ · Cmax(W′)</pre>
+        <p>
+          Pick the enforcement window <strong>W′</strong>. Pick the per-exit-unit enforcement weight
+          <strong>e</strong>. Pick the relay/mining efficiency <strong>ρ</strong>. Then show where the exit units fit.
+        </p>
+        <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
+          <thead>
+            <tr>
+              <th style="text-align: left; border-bottom: 1px solid #111; padding: 8px;">Window</th>
+              <th style="text-align: left; border-bottom: 1px solid #111; padding: 8px;">Lightning active</th>
+              <th style="text-align: left; border-bottom: 1px solid #111; padding: 8px;">Ark template</th>
+              <th style="text-align: left; border-bottom: 1px solid #111; padding: 8px;">Operator template</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border-bottom: 1px solid #d6d6d0; padding: 8px;">Fast exit: 137 blocks</td>
+              <td style="border-bottom: 1px solid #d6d6d0; padding: 8px;">74,928</td>
+              <td style="border-bottom: 1px solid #d6d6d0; padding: 8px;">136,931</td>
+              <td style="border-bottom: 1px solid #d6d6d0; padding: 8px;">128,876</td>
+            </tr>
+            <tr>
+              <td style="border-bottom: 1px solid #d6d6d0; padding: 8px;">Layer benchmark: 2016 blocks</td>
+              <td style="border-bottom: 1px solid #d6d6d0; padding: 8px;">1,102,594</td>
+              <td style="border-bottom: 1px solid #d6d6d0; padding: 8px;">2,014,992</td>
+              <td style="border-bottom: 1px solid #d6d6d0; padding: 8px;">1,896,463</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px;">Slow settlement: 4032 blocks</td>
+              <td style="padding: 8px;">2,205,189</td>
+              <td style="padding: 8px;">4,029,984</td>
+              <td style="padding: 8px;">3,792,926</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          <a href="/blockspace-conservation-may-2026.pdf">Download the PDF</a>
+          ·
+          <a href="/blockspace-conservation-may-2026.tex">Download the TeX source</a>
+        </p>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

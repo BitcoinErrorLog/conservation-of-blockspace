@@ -15,25 +15,25 @@ describe('scenario metrics', () => {
   it('recovers the 14-day layer benchmark capacity', () => {
     const metrics = scenarioMetrics(findScenario('layer-benchmark'))
     expect(metrics.effectiveWeight).toBe(5_848)
-    expect(metrics.maxUsers).toBe(1_102_594)
+    expect(metrics.maxExitUnits).toBe(1_102_594)
   })
 
   it('recovers the fast-exit stress capacity', () => {
     const metrics = scenarioMetrics(findScenario('fast-exit'))
     expect(metrics.effectiveWeight).toBe(5_848)
-    expect(metrics.maxUsers).toBe(74_928)
+    expect(metrics.maxExitUnits).toBe(74_928)
   })
 
   it('estimates Ark capacities for 14-day windows', () => {
     const metrics = scenarioMetrics(findScenario('ark-layer-benchmark'))
     expect(metrics.effectiveWeight).toBe(3_200)
-    expect(metrics.maxUsers).toBe(2_014_992)
+    expect(metrics.maxExitUnits).toBe(2_014_992)
   })
 
   it('estimates illustrative operator-assisted capacities', () => {
     const metrics = scenarioMetrics(findScenario('operator-layer-benchmark'))
     expect(metrics.effectiveWeight).toBe(3_400)
-    expect(metrics.maxUsers).toBe(1_896_463)
+    expect(metrics.maxExitUnits).toBe(1_896_463)
   })
 })
 

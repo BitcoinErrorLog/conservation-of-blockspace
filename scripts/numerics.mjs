@@ -23,7 +23,7 @@ function nMax(rho, windowBlocks, perUserWeight) {
 }
 
 console.log('C_max(W\'=137) wu:', C_MAX_137)
-console.log('ρ_obs illustrative example:', (1 - 160_200_000 / C_MAX_137).toFixed(4))
+console.log('ρ_obs illustrative admission/inclusion example:', (1 - 152_100_000 / C_MAX_137).toFixed(4))
 console.log('replacement term share:', (118_400_000 / C_MAX_137).toFixed(4))
 
 console.log('\n--- Primary table: exit capacity by enforcement window (rho=0.8) ---')

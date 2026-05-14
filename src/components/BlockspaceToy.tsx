@@ -86,16 +86,16 @@ const percentFormatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 1,
 })
 
-const Chart = ({ points }: { points: { windowBlocks: number; maxUsers: number }[] }) => {
+const Chart = ({ points }: { points: { windowBlocks: number; maxExitUnits: number }[] }) => {
   const width = 640
   const height = 260
   const padding = 32
   const maxX = Math.max(...points.map((p) => p.windowBlocks), 1)
-  const maxY = Math.max(...points.map((p) => p.maxUsers), 1)
+  const maxY = Math.max(...points.map((p) => p.maxExitUnits), 1)
   const pathD = points
     .map((point, index) => {
       const x = padding + (point.windowBlocks / maxX) * (width - 2 * padding)
-      const y = height - padding - (point.maxUsers / maxY) * (height - 2 * padding)
+      const y = height - padding - (point.maxExitUnits / maxY) * (height - 2 * padding)
       return `${index === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`
     })
     .join(' ')
@@ -104,7 +104,7 @@ const Chart = ({ points }: { points: { windowBlocks: number; maxUsers: number }[
       <path d={pathD} fill="none" stroke="#2563eb" strokeWidth={3} strokeLinecap="round" />
       {points.map((point) => {
         const x = padding + (point.windowBlocks / maxX) * (width - 2 * padding)
-        const y = height - padding - (point.maxUsers / maxY) * (height - 2 * padding)
+        const y = height - padding - (point.maxExitUnits / maxY) * (height - 2 * padding)
         return <circle key={point.windowBlocks} cx={x} cy={y} r={5} fill="#2563eb" />
       })}
       <text x={padding} y={20} className="sparkline-label">
@@ -145,7 +145,7 @@ export function BlockspaceToy() {
   const stats = useMemo(() => {
     const totalCapacity = cMax(windowBlocks, wCoinbase)
     const usableCapacity = effectiveCapacity(rho, windowBlocks, wCoinbase)
-    const maxUsers = nMax(rho, windowBlocks, perUserWeight, wCoinbase)
+    const maxExitUnits = nMax(rho, windowBlocks, perUserWeight, wCoinbase)
     const avgPerBlockCapacity = Math.max(0, (totalCapacity / Math.max(windowBlocks, 1)) || 0)
     const sampleDemand = 50_000
     const minLeadTime = leadTimeBlocks(sampleDemand, perUserWeight, rho, avgPerBlockCapacity)
@@ -158,7 +158,7 @@ export function BlockspaceToy() {
     return {
       totalCapacity,
       usableCapacity,
-      maxUsers,
+      maxExitUnits,
       zoneFastExit,
       zoneSameE,
       avgPerBlockCapacity,
@@ -171,7 +171,7 @@ export function BlockspaceToy() {
     () =>
       horizonBlocks.map((blocks) => ({
         windowBlocks: blocks,
-        maxUsers: nMax(rho, blocks, perUserWeight, wCoinbase),
+        maxExitUnits: nMax(rho, blocks, perUserWeight, wCoinbase),
       })),
     [rho, perUserWeight, wCoinbase],
   )
@@ -222,7 +222,7 @@ export function BlockspaceToy() {
       },
       scenario: scenarioForPersistence,
       metrics: {
-        nMax: stats.maxUsers,
+        nMax: stats.maxExitUnits,
         rho,
         windowBlocks,
         perUserWeight,
@@ -245,12 +245,11 @@ export function BlockspaceToy() {
   return (
     <div className="app toy-embed">
       <header>
-        <p className="eyebrow">Credible Exit Playground</p>
         <h1>Law of Conservation of Blockspace</h1>
         <p className="lede">
-          Adjust the efficiency coefficient ρ, usable window W&apos;, and per-user enforcement weight
-          e to see the lower bound on simultaneous exits implied by byte accounting. Compare a hypothetical
-          simultaneous exit count to the fast-exit envelope and same-weight slope bands.
+          Test your favorite layer by entering its usable window W&apos;, per-exit-unit enforcement weight e, and
+          efficiency coefficient ρ. The toy shows how many exit units can fit through the exit path before the
+          window closes. Human users map onto exit units according to the protocol and wallet topology.
         </p>
       </header>
 
@@ -258,7 +257,7 @@ export function BlockspaceToy() {
         <div className="panel-header">
           <div>
             <h2>Presets &amp; Inputs</h2>
-            <p>Select a window benchmark or tweak the sliders.</p>
+            <p>Use a benchmark, or enter your protocol&apos;s window and exit weight.</p>
           </div>
           <div className="panel-actions">
             <button type="button" className="ghost" onClick={shareScenario}>
@@ -288,7 +287,7 @@ export function BlockspaceToy() {
 
         <div className="controls-grid">
           <label className="control">
-            <span>Simultaneous exits (demand N)</span>
+            <span>Simultaneous exit units (demand N)</span>
             <input
               type="number"
               min={0}
@@ -296,7 +295,7 @@ export function BlockspaceToy() {
               value={exitDemand}
               onChange={(event) => setExitDemand(Math.max(0, Number(event.target.value)))}
             />
-            <small>Compared to slope bands below — not to N_max capacity alone</small>
+            <small>Exit units are enforcement traces, not necessarily human users.</small>
           </label>
 
           <label className="control">
@@ -319,6 +318,7 @@ export function BlockspaceToy() {
                 onChange={(event) => updateCustomState({ rho: Number(event.target.value) })}
               />
             </div>
+            <small>ρ is how much of the window is actually usable under policy and congestion.</small>
           </label>
 
           <label className="control">
@@ -331,11 +331,11 @@ export function BlockspaceToy() {
                 updateCustomState({ windowBlocks: Math.max(1, Number(event.target.value)) })
               }
             />
-            <small>≈ {(windowBlocks / 144).toFixed(1)} days</small>
+            <small>W′ is time bought by the user: ≈ {(windowBlocks / 144).toFixed(1)} days.</small>
           </label>
 
           <label className="control">
-            <span>Per-user weight e (wu)</span>
+            <span>Per-exit-unit weight e (wu)</span>
             <input
               type="number"
               min={1}
@@ -345,8 +345,8 @@ export function BlockspaceToy() {
               }
             />
             <small>
-              LN idle ≈ 2,360 · HTLC-stress ≈ 5,848 · Ark-style illustrative ≈ 3,200 ·
-              operator-assisted illustrative ≈ 3,400
+              e is the on-chain footprint each exit unit cannot hide. LN idle ≈ 2,360 · HTLC-stress ≈ 5,848 ·
+              Ark template ≈ 3,200 · operator-assisted template ≈ 3,400.
             </small>
           </label>
 
@@ -369,8 +369,8 @@ export function BlockspaceToy() {
         <div className="metrics-grid">
           <article className="metric-card">
             <h3>N_max</h3>
-            <p className="metric-value">{numberFormatter.format(stats.maxUsers)}</p>
-            <p className="metric-hint">Upper bound on simultaneous exits at your ρ, W′, e</p>
+            <p className="metric-value">{numberFormatter.format(stats.maxExitUnits)}</p>
+            <p className="metric-hint">Upper bound on simultaneous exit units at your ρ, W′, e</p>
           </article>
           <article className="metric-card">
             <h3>ρ·C_max (wu)</h3>
@@ -422,7 +422,7 @@ export function BlockspaceToy() {
                 <tr key={point.windowBlocks}>
                   <td>{numberFormatter.format(point.windowBlocks)}</td>
                   <td>{(point.windowBlocks / 144).toFixed(1)}</td>
-                  <td>{numberFormatter.format(point.maxUsers)}</td>
+                  <td>{numberFormatter.format(point.maxExitUnits)}</td>
                 </tr>
               ))}
             </tbody>

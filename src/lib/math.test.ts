@@ -40,10 +40,9 @@ describe('rhoFromLosses', () => {
       windowBlocks: 137,
       replaced: 118_400_000,
       orphan: 22_800_000,
-      dust: 8_100_000,
       policy: 10_900_000,
     })
-    expect(rho).toBeCloseTo(0.71, 2)
+    expect(rho).toBeCloseTo(0.7223, 4)
   })
 
   it('computes the replacement term share from the illustrative example', () => {

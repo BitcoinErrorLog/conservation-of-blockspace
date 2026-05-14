@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 
 import hostileReviewMd from '@docs/HOSTILE_REVIEW.md?raw'
@@ -6,9 +5,6 @@ import hostileReviewMd from '@docs/HOSTILE_REVIEW.md?raw'
 export function HostileReview() {
   return (
     <article className="page memo-markdown">
-      <p className="memo-back">
-        <Link to="/faq">FAQ</Link> · <Link to="/review">Review packet</Link>
-      </p>
       <ReactMarkdown
         components={{
           h1: ({ children }) => <h1>{children}</h1>,

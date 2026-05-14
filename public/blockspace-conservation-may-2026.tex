@@ -23,52 +23,58 @@
 
 \title{Credible Exit and the Law of Conservation of Blockspace \\
 \vskip 0.5em
-\small v1.10.0 -- Window-Slope Enforcement Model\\
-A necessary byte-accounting bound for unilateral Bitcoin layer exits.}
+\small v1.10.3 -- Window-Slope Enforcement Model\\
+A necessary block-weight accounting bound for unilateral Bitcoin layer exits.}
 
 \author{John Carvalho (BitcoinErrorLog)}
 \date{May 2026}
 \maketitle
 
 \begin{abstract}
-Bitcoin layers can increase cooperative payment throughput, but their non-custodial safety still depends on the base layer when users must enforce without cooperation. We define \textit{credible exit} as a user's ability to confirm the transaction set needed to obtain a spendable Layer~1 claim under their keys within a usable safety window $W'$ and with non-dust value remaining.
-We state the \textit{Law of Conservation of Blockspace} as a finite-window byte-accounting bound: for any simultaneous exit cohort with per-user enforcement weights $e_i$, credible unilateral enforcement requires
+Bitcoin layers can increase cooperative payment throughput, but their non-custodial safety still depends on the base layer when users must enforce without cooperation. We define an \textit{exit unit} as the minimal unilateral enforcement trace for a distinct claim, and \textit{credible exit} as the ability to confirm the transaction set needed to secure that claim within a usable safety window $W'$ and with non-dust value remaining.
+The \textit{Law of Conservation of Blockspace} is a finite-window block-weight accounting bound: for any simultaneous exit cohort with per-exit-unit enforcement weights $e_i$, credible unilateral enforcement requires
 \begin{equation*}
 \textstyle \sum_i N_i e_i \le \rho C_{\max}(W').
 \end{equation*}
-where $\rho$ captures the fraction of physical block capacity usable for the relevant enforcement packages under prevailing relay, policy, fee-bumping, and miner-selection conditions. This bound does not forecast average payment throughput; it gives a necessary condition for worst-case non-cooperative exit.
-The central tradeoff is the enforcement window. A one-day window is a fast-exit stress case, useful for short-window Lightning expectations. Fourteen days is the main cross-layer benchmark for timeout, challenge, and operator-failure designs. Twenty-eight days is a slow-settlement runway. Under the reference weights used here and $\rho=0.8$, a 14-day window clears approximately \textbf{1.1M} Lightning HTLC-stress exits, \textbf{2.0M} Ark-style exits, or \textbf{1.9M} operator-assisted exits. These capacities are purchased with time, not new blockspace.
+where $\rho$ bounds the fraction of physical block capacity usable for the relevant enforcement packages under prevailing relay, policy, fee-bumping, and miner-selection conditions. This bound does not forecast average payment throughput; it gives a necessary condition for worst-case non-cooperative exit. The central tradeoff is the enforcement window: 1 day is a fast-exit stress case, 14 days is the main cross-layer benchmark, and 28 days is a slow-settlement runway. Under the reference weights used here and $\rho=0.8$, a 14-day window clears approximately \textbf{1.1M} Lightning HTLC-stress exit units, \textbf{2.0M} Ark-style exit units, or \textbf{1.9M} operator-assisted exit units. These capacities are purchased with time, not new blockspace.
 \end{abstract}
 
 
 \section{Introduction}
 Bitcoin layers are often analogized to the layered structure of the internet and web. The analogy is useful for describing interfaces, but misleading for settlement guarantees. Web data can be copied, cached, and retransmitted; bitcoin claims remain anchored to the finite blockspace of the proof-of-work chain \cite{lightning}. Off-chain systems can defer, net, route, or coordinate claims, but when cooperation fails their unilateral enforcement paths still terminate on Layer~1.
 
-This paper studies that enforcement path. We ask how many users can obtain spendable on-chain claims under their own keys inside the same usable safety window $W'$. The answer is not a property of payment throughput. It is a byte-accounting constraint: the total serialized weight of the required enforcement packages must fit inside the enforcement-eligible blockspace available during the window.
+This paper studies that enforcement path. We ask how many exit units can secure operator-independent on-chain claims inside the same usable safety window $W'$. Human users, wallets, channels, VTXOs, accounts, and other protocol states map onto exit units according to the protocol and wallet topology. The answer is not a property of payment throughput. It is a block-weight accounting constraint: the total serialized weight of the required enforcement packages must fit inside the enforcement-eligible blockspace available during the window.
 
 Layers remain useful. Lightning, factories, Ark-style timeout trees, and operator-assisted systems can improve common-case coordination and reduce average on-chain activity \cite{factory,ark}. The narrower claim here is that, within today's consensus rules, they do not create unlimited unilateral exit capacity. They transform the timing, coordination, and trust assumptions around a finite settlement surface.
 
+For any claimed scaling construction, the relevant question is not its cooperative throughput, but the weight and timing of the smallest transaction trace by which each user can force an operator-independent Layer~1 claim.
+
 \subsection*{Related Work}
-Our analysis provides a static byte-accounting lower bound on exit capacity. It is distinct from dynamic attack work such as ``Flood \& Loot'' \cite{harrisZohar}, ``Time-Dilation'' \cite{riardNaumenko}, and Lightning mass-exit simulations \cite{sguanci2022}, which study adversarial behavior, topology, or congestion dynamics. Policy work on TRUC / BIP-431 and package relay improves fee-bumping reliability for time-sensitive protocols \cite{bip431,core28,packagepolicy}. Cluster mempool proposals improve mempool ordering, eviction, and replacement incentives \cite{clusterMempool}. These improvements can raise observed efficiency $\rho$ and reduce stranded bytes; they do not remove the finite-window constraint for disjoint unilateral enforcement packages.
+Our analysis provides a static block-weight lower bound on exit capacity. It is distinct from dynamic attack work such as ``Flood \& Loot'' \cite{harrisZohar}, ``Time-Dilation'' \cite{riardNaumenko}, and Lightning mass-exit simulations \cite{sguanci2022}, which study adversarial behavior, topology, or congestion dynamics. Policy work on TRUC / BIP-431 and package relay improves fee-bumping reliability for time-sensitive protocols \cite{bip431,core28,core31,packagepolicy}. Cluster mempool improves mempool ordering, eviction, relay announcements, and replacement incentives \cite{clusterMempool,core31}. These improvements can raise observed efficiency $\rho$ and reduce stranded weight; they do not remove the finite-window constraint for disjoint unilateral enforcement packages.
 
 \section{Motivation}
-Layers only help if each user can enforce ownership alone, in time, and with value left over. When exits bunch up, fees spike, or relay policy reduces bumping surface, some users miss the window or take haircuts. We make this risk measurable by relating three quantities: (i) usable blocks $W'$, (ii) enforcement-eligible capacity over that window, and (iii) the per-user byte cost $e$. We identify a \textbf{Regime Change} at a critical user threshold $N_{\max}$: below this line, unilateral enforcement remains credible under the stated assumptions; above it, users rely on cooperation, operators, or delayed resolution rather than guaranteed solo exit.
+Layers only help if each claim can be enforced alone, in time, and with value left over. When exits bunch up, fees spike, or relay policy reduces bumping surface, some exit units miss the window or take haircuts. We make this risk measurable by relating three quantities: (i) usable blocks $W'$, (ii) enforcement-eligible capacity over that window, and (iii) the per-exit-unit enforcement weight $e$. We identify a \textbf{Regime Change} at a critical exit-unit threshold $N_{\max}$: below this line, unilateral enforcement remains credible under the stated assumptions; above it, claimants rely on cooperation, operators, or delayed resolution rather than guaranteed solo exit.
 
 \section{Preliminaries}
 \paragraph{Units.} We use weight units; $1~\mathrm{vB} = 4~\mathrm{wu}$.
 
+\begin{definition}[Exit unit]
+An \emph{exit unit} is the minimal unilateral enforcement trace that must confirm for a distinct claim to remain enforceable without cooperation. Human users, wallets, channels, VTXOs, accounts, or application balances map onto exit units according to the protocol and wallet topology. The variable $N$ counts exit units, not necessarily people.
+\end{definition}
+
 \begin{definition}[Credible exit]
-A user has \emph{credible exit} if, without cooperation, they can confirm within the usable window $W'$ a transaction set that yields a spendable L1 claim under their keys with non-dust value and economic viability:
+A user has \emph{credible exit} if, without cooperation, they can confirm within the usable window $W'$ a transaction set that secures an operator-independent L1 claim under their keys with non-dust value and economic viability:
 \small
 \begin{equation*}
 v \ge \mathrm{fee}(e,f^*) + \mathrm{dust}_{\mathrm{policy}}(\mathrm{type}) + \Delta.
 \end{equation*}
 \normalsize
+In protocols with CSV, challenge, contest, or revocation windows, $W'$ refers to the window for confirming the transactions required to secure the user's unilateral claim before loss or timeout, not necessarily the wall-clock time until every encumbered output becomes freely spendable.
 \end{definition}
 
 
 \begin{definition}[Efficiency coefficient $\rho$]
-Fix a usable window $W'$ and relay/mining policy surface $P$. Let $\rho \in (0,1]$ denote the fraction of physical block capacity over $W'$ that is actually usable by the exit cohort after relay policy, package topology, fee-bumping, miner selection, and congestion friction are accounted for. The effective optimistic enforcement envelope is
+Fix a usable window $W'$ and relay/mining policy surface $P$. Let $\rho \in (0,1]$ be a model parameter that bounds the fraction of physical block capacity over $W'$ usable by the exit cohort after relay policy, package topology, fee-bumping, miner selection, and congestion friction are accounted for. The effective optimistic enforcement envelope is
 \small
 \begin{equation*}
 C_{\mathrm{eff}}(W',P) \;\le\; \rho C_{\max}(W'),
@@ -92,19 +98,19 @@ The theorem uses $\rho$ as a model parameter. Historical data may produce an obs
 \end{remark}
 
 \paragraph{Estimating $\rho_{\mathrm{obs}}$ from observables.}
-For a specified dataset and package class, practitioners can estimate a historical efficiency coefficient by decomposing the window into physical capacity and loss terms:
+For a specified dataset and package class, practitioners can estimate a historical admission/inclusion efficiency coefficient by decomposing the window into physical capacity and capacity-loss terms:
 \small
 \begin{equation*}
-\rho_{\mathrm{obs}} \;=\; 1 - \frac{w_{\mathrm{replaced}} + w_{\mathrm{stale}} + w_{\mathrm{dust}} + w_{\mathrm{policy}} + w_{\mathrm{other}}}{(4{,}000{,}000 - w_{cb}) \cdot W'}.
+\rho_{\mathrm{obs}} \;=\; 1 - \frac{w_{\mathrm{replaced}} + w_{\mathrm{stale}} + w_{\mathrm{policy}} + w_{\mathrm{other}}}{(4{,}000{,}000 - w_{cb}) \cdot W'}.
 \end{equation*}
 \normalsize
-Here $w_{\mathrm{replaced}}$ is weight consumed or evicted through replacement churn, $w_{\mathrm{stale}}$ is stale-block or reorg-related weight that did not contribute to canonical settlement, $w_{\mathrm{dust}}$ is weight made uneconomic by dust and fee conditions, and $w_{\mathrm{policy}}$ captures packages filtered by relay or package limits. These terms are not universal constants; each empirical use must publish the dataset, parser, checksums, and intermediate outputs.
+Here $w_{\mathrm{replaced}}$ is weight consumed or evicted through replacement churn, $w_{\mathrm{stale}}$ is stale-block or reorg-related weight that did not contribute to canonical settlement, and $w_{\mathrm{policy}}$ captures packages filtered by relay or package limits. Dust and fee viability remain separate economic constraints in the credible-exit definition rather than capacity-loss terms inside $\rho_{\mathrm{obs}}$. These terms are not universal constants; each empirical use must publish the dataset, parser, checksums, and intermediate outputs.
 
 \paragraph{Illustrative arithmetic example.}
-The following numbers are an arithmetic example of the estimator, not a live measurement claim. For a 137-block window, $C_{\max}=(4{,}000{,}000-2{,}000)\cdot137=547{,}726{,}000$ wu. If the loss terms are $w_{\mathrm{replaced}}=118{,}400{,}000$ wu, $w_{\mathrm{stale}}=22{,}800{,}000$ wu, $w_{\mathrm{dust}}=8{,}100{,}000$ wu, and $w_{\mathrm{policy}}=10{,}900{,}000$ wu, then total losses are $160{,}200{,}000$ wu and
+The following numbers are an arithmetic example of the estimator, not a live measurement claim. For a 137-block window, $C_{\max}=(4{,}000{,}000-2{,}000)\cdot137=547{,}726{,}000$ wu. If the capacity-loss terms are $w_{\mathrm{replaced}}=118{,}400{,}000$ wu, $w_{\mathrm{stale}}=22{,}800{,}000$ wu, and $w_{\mathrm{policy}}=10{,}900{,}000$ wu, then total capacity losses are $152{,}100{,}000$ wu and
 \small
 \begin{equation*}
-\rho_{\mathrm{obs}} \approx 1 - \frac{160{,}200{,}000}{547{,}726{,}000} = 0.7075.
+\rho_{\mathrm{obs}} \approx 1 - \frac{152{,}100{,}000}{547{,}726{,}000} = 0.7223.
 \end{equation*}
 \normalsize
 The replacement term alone is $21.6\%$ of this window's physical capacity. The scenario tables below do not rely on this example; they explicitly choose their own $\rho$ values.
@@ -118,7 +124,6 @@ Component & Weight (wu) \\
 \midrule
 $w_{\mathrm{replaced}}$ & $118{,}400{,}000$ \\
 $w_{\mathrm{stale}}$ & $22{,}800{,}000$ \\
-$w_{\mathrm{dust}}$ & $8{,}100{,}000$ \\
 $w_{\mathrm{policy}}$ & $10{,}900{,}000$ \\
 \bottomrule
 \end{tabular}
@@ -127,8 +132,8 @@ $w_{\mathrm{policy}}$ & $10{,}900{,}000$ \\
 \paragraph{Notation.} We use the following notation throughout:
 \begin{itemize}
     \itemsep0em
-    \item $e$: Per-user enforcement weight (wu).
-    \item $N$: Number of users attempting simultaneous exit.
+    \item $e$: Per-exit-unit enforcement weight (wu).
+    \item $N$: Number of exit units attempting simultaneous enforcement.
     \item $\Delta$: Economic viability buffer (e.g., 0.0001 BTC).
     \item $m$: Transaction overhead margin (headers, version bytes $\approx$ 40--80 wu).
 \end{itemize}
@@ -138,22 +143,22 @@ $w_{\mathrm{policy}}$ & $10{,}900{,}000$ \\
 We model a simultaneous exit cohort submitted at the start of a usable window $W'$. The model assumes: (A1) consensus limits each block to $4{,}000{,}000$ wu minus coinbase overhead; (A2) the relevant relay and miner policy surface $P$ admits the cohort's enforcement packages when they satisfy fee and topology rules; (A3) the window is saturated by enforcement demand whenever demand exceeds available capacity. These assumptions are sufficient for an impossibility bound: if demand exceeds even the optimistic envelope $\rho C_{\max}(W')$, the cohort cannot clear.
 
 \paragraph{Policy status.}
-BIP-431 defines Topologically Restricted Until Confirmation (TRUC) transactions with one-parent-one-child topology limits for more reliable fee-bumping \cite{bip431}. Bitcoin Core v28 made version-3/TRUC transactions standard policy, but BIP-431 remains a draft informational BIP and operational guarantees still depend on wallet, relay, miner, and package-relay adoption \cite{core28,packagepolicy}. Cluster mempool is a broader mempool-ordering and replacement design; it changes realized policy efficiency, not the physical block-weight ceiling \cite{clusterMempool}.
+BIP-431 defines Topologically Restricted Until Confirmation (TRUC) transactions with one-parent-one-child topology limits for more reliable fee-bumping \cite{bip431}. Bitcoin Core v28 made version-3/TRUC transactions standard policy, but BIP-431 remains a draft informational BIP and operational guarantees still depend on wallet, relay, miner, and package-relay adoption \cite{core28,packagepolicy}. Bitcoin Core v31 introduced cluster mempool, removed the CPFP carveout from mempool logic, and expanded one-parent-one-child package relay behavior to non-TRUC packages whose parent may be below the minimum relay feerate when paid for by the child \cite{core31}. These policy changes affect realized relay efficiency and pinning resistance; they do not change the physical block-weight ceiling.
 
 \begin{principle}[Conservation of Blockspace]
-Assuming (A1)--(A3) hold, the total enforcement weight required by all users in a simultaneous credible-exit cohort must satisfy:
+Assuming (A1)--(A3) hold, the total enforcement weight required by all exit units in a simultaneous credible-exit cohort must satisfy:
 \small
 \begin{equation*}
 \sum_i N_i e_i \le \rho \cdot C_{\max}(W').
 \end{equation*}
 \normalsize
-If $\sum_i N_i e_i > \rho C_{\max}(W')$, enforcement inside the usable window is impossible for at least one user in the cohort.
+If $\sum_i N_i e_i > \rho C_{\max}(W')$, enforcement inside the usable window is impossible for at least one exit unit in the cohort.
 \end{principle}
 
 \begin{proof}
-For each user type $i$, let $e_i$ be the minimum serialized weight of the transaction package needed for one user of that type to obtain a spendable Layer~1 claim without cooperation. The unilateral-footprint assumption below implies that these packages have positive marginal weight per user; otherwise the construction has not specified how distinct users independently enforce their claims.
+For each exit-unit type $i$, let $e_i$ be the minimum serialized weight of the transaction package needed for one exit unit of that type to secure an operator-independent Layer~1 claim without cooperation. The unilateral-footprint assumption below implies that these packages have positive marginal weight per exit unit; otherwise the construction has not specified how distinct claims are independently enforced.
 
-A cohort with $N_i$ users of each type therefore requires at least
+A cohort with $N_i$ exit units of each type therefore requires at least
 \small
 \begin{equation*}
 A = \sum_i N_i e_i
@@ -161,15 +166,15 @@ A = \sum_i N_i e_i
 \normalsize
 weight units of successful enforcement service. During $W'$ blocks, the physical chain can include at most $C_{\max}(W')$ weight units, and only a fraction $\rho$ is usable for the relevant enforcement packages under the chosen policy and friction assumptions. Thus the usable enforcement envelope is at most $\rho C_{\max}(W')$.
 
-If $A > \rho C_{\max}(W')$, the cohort requires more enforcement weight than the window can contain. At least one user's package cannot confirm within $W'$, contradicting credible exit. Hence $\sum_i N_i e_i \le \rho C_{\max}(W')$ is necessary.
+If $A > \rho C_{\max}(W')$, the cohort requires more enforcement weight than the window can contain. At least one exit unit's package cannot confirm within $W'$, contradicting credible exit. Hence $\sum_i N_i e_i \le \rho C_{\max}(W')$ is necessary.
 \end{proof}
 
 \begin{remark}[Non-work-conserving or multi-server miners]
-If miners controlling a hash-rate fraction $\alpha$ leave systematic slack (e.g., by enforcing custom filters or mining empty blocks), the effective service envelope shrinks to $\rho (1-\alpha) C_{\max}$. The bound remains valid after substituting this reduced envelope, but users must inflate $W'$ or reduce $N$ proportionally. Empirical monitoring of template fullness and policy adoption therefore becomes a prerequisite for operational guarantees.
+If miners controlling a hash-rate fraction $\alpha$ leave systematic slack or exclude the relevant enforcement package class, the effective service envelope shrinks by a policy-dependent factor. In the extreme case where that hash-rate fraction contributes no usable enforcement capacity for the cohort, the envelope becomes $\rho (1-\alpha) C_{\max}$. The bound remains valid after substituting the appropriate reduced envelope, but users must inflate $W'$ or reduce $N$ proportionally. Empirical monitoring of template fullness and policy adoption therefore becomes a prerequisite for operational guarantees.
 \end{remark}
 
 \begin{lemma}[Lead time]
-Assume $\rho$ and the average per-block enforcement-eligible capacity $\bar c(P)$ remain fixed over the clearance period. For a simultaneous cohort of $N_0$ unilateral exits with per-user weight $e$, the first-order quiet time to clear is $L_{\min} \approx \frac{N_0 e}{\rho \cdot \bar c(P)}$ blocks. If $L_{\min} > W'$, at least one user fails the usable-window requirement.
+Assume $\rho$ and the average physical per-block capacity $\bar c_{\mathrm{phys}}=4{,}000{,}000-w_{cb}$ remain fixed over the clearance period. For a simultaneous cohort of $N_0$ unilateral exit units with per-unit weight $e$, the first-order quiet time to clear is $L_{\min} \approx \frac{N_0 e}{\rho \cdot \bar c_{\mathrm{phys}}}$ blocks. If $L_{\min} > W'$, at least one exit unit fails the usable-window requirement.
 \end{lemma}
 
 \section{Bounds and The Insolvency Horizon}
@@ -182,14 +187,14 @@ Assume $\rho$ and the average per-block enforcement-eligible capacity $\bar c(P)
 
 \medskip
 \noindent\textbf{Lemma (Positive Unilateral Footprint).}\label{lem:disjointness}
-For each user $u$, let $\Pi_u$ be a minimal transaction package that gives $u$ a spendable Layer~1 claim without cooperation. If two users can both enforce unilaterally, then each must contribute positive marginal serialized weight to the set of enforcing transactions. A construction that claims zero marginal weight for an additional user must specify the transaction, output, script path, proof, or operator-independent mechanism by which that user exits alone; otherwise it is outside the unilateral non-custodial model studied here.
+For each exit unit $u$, let $\Pi_u$ be a minimal transaction package that secures $u$'s operator-independent Layer~1 claim without cooperation. If two exit units can both enforce unilaterally, then each must contribute positive marginal serialized weight to the set of enforcing transactions. A construction that claims zero marginal weight for an additional exit unit must specify the transaction, output, script path, proof, or operator-independent mechanism by which that claim is enforced alone; otherwise it is outside the unilateral non-custodial model studied here.
 
 \begin{proof}[Proof sketch]
-Bitcoin consensus validates concrete serialized transactions that spend concrete outputs under concrete scripts. A user's unilateral claim must eventually identify spend authority, value, and ordering constraints for that user's Layer~1 output or penalty path. Shared roots, factories, timeout trees, and fraud-proof games can amortize setup and cooperative operation, but the non-cooperative fallback still needs user-specific spend data, witness data, or a user-specific branch of an enforcing trace. If no such positive marginal footprint exists, the user cannot independently force a spendable Layer~1 claim; they instead rely on another party's ordering, batching, or custody decision.
+Bitcoin consensus validates concrete serialized transactions that spend concrete outputs under concrete scripts. A unilateral claim must eventually identify spend authority, value, and ordering constraints for that claim's Layer~1 output or penalty path. Shared roots, factories, timeout trees, and fraud-proof games can amortize setup and cooperative operation, but the non-cooperative fallback still needs claim-specific spend data, witness data, or a claim-specific branch of an enforcing trace. If no such positive marginal footprint exists, the claimant cannot independently secure an operator-independent Layer~1 claim; they instead rely on another party's ordering, batching, or custody decision.
 \end{proof}
 
 \begin{remark}[TRUC and package topology]
-TRUC / BIP-431 strengthens fee-bumping analysis by bounding unconfirmed package topology to a one-parent-one-child pattern for opted-in transactions \cite{bip431,core28}. This policy helps reason about relay admission and pinning resistance, but it is not the source of the conservation law. The lower bound follows from the need for positive unilateral enforcement bytes; policy determines which bytes are admissible and how much efficiency is lost.
+TRUC / BIP-431 strengthens fee-bumping analysis by bounding unconfirmed package topology to a one-parent-one-child pattern for opted-in transactions \cite{bip431,core28}. Bitcoin Core v31 extends some one-parent-one-child relay behavior beyond TRUC while removing the older CPFP carveout path \cite{core31}. These policies help reason about relay admission and pinning resistance, but they are not the source of the conservation law. The lower bound follows from the need for positive unilateral enforcement weight; policy determines which weight is admissible and how much efficiency is lost.
 \end{remark}
 
 \paragraph{Relation to batching proposals.}
@@ -197,16 +202,19 @@ Channel factories \cite{factory}, Ark-style timeout trees \cite{ark}, and BitVM-
 
 \medskip
 \noindent\textbf{Constraint 2 (Template Packing).}
-For a tree structure with branching factor $T$, root weight $w_{\mathrm{root}}$, average branch weight $w_{\mathrm{branch}}$, and average users per minimal unilateral enforcing package $\bar{u}$, a template estimate is
+For a tree or shared-commitment structure, let $u$ be an exit unit and let $\ell \in \mathrm{path}(u)$ range over the shared components that appear in $u$'s unilateral enforcing trace. If $U_\ell$ exit units actually share component $\ell$ in that trace, and $U_{\mathrm{root}}$ exit units share the root component, then a defensible template lower bound is
 \small
 \begin{equation*}
-e \;\ge\; w_{\mathrm{leaf}} + \frac{w_{\mathrm{branch}}}{\bar{u}} + \frac{w_{\mathrm{root}}}{T} + m.
+e_u \;\ge\; w_{\mathrm{leaf},u}
++ \sum_{\ell \in \mathrm{path}(u)} \frac{w_{\mathrm{branch},\ell}}{U_\ell}
++ \frac{w_{\mathrm{root}}}{U_{\mathrm{root}}}
++ m.
 \end{equation*}
 \normalsize
-Here $\bar{u}$ refers to users pooled in the same minimal unilateral enforcing package, not users who cooperate in the common path. Under one-parent-one-child relay policy, package-level sharing is tightly constrained; under other policies or constructions, the protocol must show the concrete enforcing trace.
+Here the denominator is not a generic branching factor; it is the number of exit units whose unilateral enforcing trace actually shares that serialized component. Under one-parent-one-child relay policy, package-level sharing is tightly constrained; under other policies or constructions, the protocol must show the concrete enforcing trace.
 
 \begin{remark}[Economic viability]
-The byte bound is separate from fee-market equilibrium. As simultaneous demand approaches the usable window envelope, users compete for scarce confirmation capacity and the feerate required for timely confirmation can rise. A user's economic exit also requires $v \ge \mathrm{fee}(e,f^*)+\mathrm{dust}_{\mathrm{policy}}+\Delta$. Modeling $f^*$ as a function of demand is outside this paper; the inequality above is the prior capacity condition.
+The block-weight bound is separate from fee-market equilibrium. As simultaneous demand approaches the usable window envelope, users compete for scarce confirmation capacity and the feerate required for timely confirmation can rise. A user's economic exit also requires $v \ge \mathrm{fee}(e,f^*)+\mathrm{dust}_{\mathrm{policy}}+\Delta$. Modeling $f^*$ as a function of demand is outside this paper; the inequality above is the prior capacity condition.
 \end{remark}
 
 \section{Instantiations}
@@ -214,7 +222,7 @@ The byte bound is separate from fee-market equilibrium. As simultaneous demand a
 Exit in Lightning is not merely the commitment transaction. The enforcement weight $e$ depends on channel format, anchors and CPFP, HTLC state, second-stage transactions, output type, and whether the modeled goal is immediate confirmation or eventual spendability. The usable window $W'$ is likewise not identical to raw \texttt{to\_self\_delay}; it should account for the blocks a user is willing to spend on broadcast, confirmation, CSV delay, and any HTLC deadline interactions.
 
 \paragraph{Reference Lightning profile.}
-For the scenario tables we use a conservative anchor-channel profile derived from BOLT~3 expected weights \cite{bolt3}. BOLT~3 gives an anchor commitment transaction weight of $1124 + 172h$ wu, where $h$ is the number of untrimmed HTLC outputs, and HTLC second-stage transactions weigh approximately $666$--$706$ wu depending on timeout vs. success path. We model idle exits as $e_{\mathrm{idle}}=2360$ wu, which includes the anchor commitment plus a compact bump/final-spend margin, and active HTLC-stress exits as
+For the scenario tables we use a conservative anchor-channel profile derived from BOLT~3 expected weights \cite{bolt3}. BOLT~3 gives an anchor commitment transaction weight of $1124 + 172h$ wu, where $h$ is the number of untrimmed HTLC outputs, and HTLC second-stage transactions weigh approximately $666$--$706$ wu depending on timeout vs. success path. We model idle exits as $e_{\mathrm{idle}}=2360$ wu: $1124$ wu for the anchor commitment plus an illustrative $1236$ wu compact bump/final-spend margin. Active HTLC-stress exits are modeled as
 \small
 \begin{equation*}
 e_{\mathrm{LN}}(h) \approx 2360 + 872h \quad (\mathrm{wu}).
@@ -232,16 +240,19 @@ We use three named windows throughout: $W'=137$ blocks as a fast-exit stress cas
 
 System capacity is derived as:
 \small
-\begin{equation*}
+\begin{equation}
 N_{\max}^{\mathrm{LN}} \;=\; \left\lfloor \frac{\rho \cdot C_{\max}(W'_{\mathrm{LN}})}{e_{\mathrm{LN}}(h)}\right\rfloor.\label{eq:nmax}
-\end{equation*}
+\end{equation}
 \normalsize
 
 \paragraph{Watchtowers and LSPs.}
-Watchtowers improve monitoring and broadcast availability; they do not remove the Layer~1 bytes required when unilateral enforcement is necessary. LSPs and other coordinators can improve common-case liquidity and cooperative recovery, but those benefits should be modeled as changed trust assumptions, changed $W'$, changed $\rho$, or changed $e$.
+Watchtowers improve monitoring and broadcast availability; they do not remove the Layer~1 weight required when unilateral enforcement is necessary. LSPs and other coordinators can improve common-case liquidity and cooperative recovery, but those benefits should be modeled as changed trust assumptions, changed $W'$, changed $\rho$, or changed $e$.
 
 \subsection{Ark-like (Timeout Trees)}
-Ark-style VTXOs use transaction trees where users hold off-chain claims that can become on-chain outputs through cooperative rounds or timeout paths \cite{ark,arkVtxo}. Covenant-less variants emulate covenant behavior through pre-signed transaction trees and key deletion \cite{arkClark}. The exact $e$ depends on the tree, covenant mechanism, connector design, fee-bump strategy, and expiry policy. We therefore treat the Ark entries in the toy as illustrative template substitutions, not protocol-wide measured constants. A concrete Ark deployment should provide its own $\Pi_u$, $e_u$, and $W'$.
+Ark-style VTXOs use transaction trees where users hold off-chain claims that can become on-chain outputs through cooperative rounds or timeout paths \cite{ark,arkVtxo}. Covenant-less variants emulate covenant behavior through pre-signed transaction trees and key deletion \cite{arkClark}. The exact $e$ depends on the tree, covenant mechanism, connector design, fee-bump strategy, and expiry policy. We therefore treat the Ark-style table entries as illustrative template substitutions, not protocol-wide measured constants. A concrete Ark deployment should provide its own $\Pi_u$, $e_u$, and $W'$.
+
+\subsection{Operator-assisted templates}
+Operator-assisted systems coordinate the common path through named services, signers, quorums, or other operators. Their cooperative throughput can be useful even when their unilateral enforcement path is sparse, delayed, or protocol-specific. The table uses $e=3400$ wu only as an illustrative template for a positive per-exit-unit fallback package. It is not a measured claim about every operator-assisted design. A concrete system should publish the transaction trace, witness budget, challenge or revocation window, and the exact condition under which an exit unit can secure an operator-independent Layer~1 claim without operator cooperation.
 
 
 \section{Quantitative Ceilings}
@@ -253,7 +264,7 @@ The central quantitative variable is the usable enforcement window $W'$. Longer 
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
-Window & Lightning active stress ($e=5848$) & Lightning idle ($e=2360$) & Ark-style ($e=3200$) & Operator-assisted ($e=3400$) \\
+Window & Lightning active stress ($e=5848$) & Lightning idle ($e=2360$) & Ark-style template ($e=3200$) & Operator-assisted template ($e=3400$) \\
 \midrule
 Fast exit: 137 blocks ($\sim$1 day) & 74,928 & 185,669 & 136,931 & 128,876 \\
 Layer benchmark: 2016 blocks (14 days) & 1,102,594 & 2,732,192 & 2,014,992 & 1,896,463 \\
@@ -263,10 +274,10 @@ Slow settlement: 4032 blocks (28 days) & 2,205,189 & 5,464,385 & 4,029,984 & 3,7
 }
 \end{table}
 
-For Table~\ref{tab:window}, each entry is $\lfloor 0.8 \cdot (4{,}000{,}000-2{,}000) \cdot W' / e \rfloor$. The 14-day row is the default cross-layer benchmark because many timeout, challenge, and operator-failure designs already use multi-week windows. The one-day row remains useful, but only as a fast-exit stress case.
+For Table~\ref{tab:window}, each entry is $\lfloor 0.8 \cdot (4{,}000{,}000-2{,}000) \cdot W' / e \rfloor$. The Ark-style and operator-assisted columns are illustrative templates until a concrete construction supplies measured enforcement traces. The 14-day row is the default cross-layer benchmark because many timeout, challenge, and operator-failure designs already use multi-week windows. The one-day row remains useful, but only as a fast-exit stress case.
 
 \subsection{Fast-Exit Stress Case}
-Table~\ref{tab:rho} shows the short-window Lightning envelope under varying efficiency. This is not the general layer benchmark. It answers a narrower question: how many users can clear when the expected safety window is approximately one day?
+Table~\ref{tab:rho} shows the short-window Lightning envelope under varying efficiency. This is not the general layer benchmark. It answers a narrower question: how many exit units can clear when the expected safety window is approximately one day?
 
 \begin{table}[h]
 \centering
@@ -281,7 +292,7 @@ High Efficiency & 0.90 & Minimal RBF & 84,294 & 208,878 \\
 Hostile / Attack & 0.50 & Heavy pinning & 46,830 & 116,043 \\
 \bottomrule
 \end{tabular}
-\footnotesize{\\ \emph{Note: Active HTLC-stress users assume $h=4$ and $e=5848$ wu. Idle users have $h=0$ and $e=2360$ wu.}}
+\footnotesize{\\ \emph{Note: Active HTLC-stress exit units assume $h=4$ and $e=5848$ wu. Idle exit units have $h=0$ and $e=2360$ wu.}}
 \end{table}
 
 The familiar ``$\sim$66k--$\sim$232k'' range is only this fast-exit envelope: $65{,}562$ active HTLC-stress exits at $\rho=0.7$ versus $232{,}087$ idle exits at $\rho=1.0$. It should not be read as the default limit for every layer.
@@ -290,28 +301,28 @@ The familiar ``$\sim$66k--$\sim$232k'' range is only this fast-exit envelope: $6
 The Security Slope is the tradeoff between capacity and time. Increasing $W'$ increases credible exit capacity, but it changes the user promise from fast exit to delayed settlement.
 
 \begin{enumerate}
-    \item \textbf{Fast exit stress case ($\sim$1 day).} One-day windows clear tens to low hundreds of thousands of exits under the reference profiles. This is the harsh Lightning/mobile/retail stress lens.
+    \item \textbf{Fast exit stress case ($\sim$1 day).} One-day windows clear tens to low hundreds of thousands of exit units under the reference profiles. This is the harsh Lightning/mobile/retail stress lens.
     \item \textbf{Layer benchmark (14 days).} Two-week windows move credible exit capacity into the low millions for representative layer weights. This is the main cross-layer comparison.
-    \item \textbf{Slow settlement runway (28 days).} Four-week windows can clear several million exits under favorable assumptions, but users are accepting delayed finality.
+    \item \textbf{Slow settlement runway (28 days).} Four-week windows can clear several million exit units under favorable assumptions, but users are accepting delayed finality.
 \end{enumerate}
 
 \begin{remark}[The Scorched Earth Limit]
-Fee bidding cannot include bytes that do not fit in the window. Once required enforcement weight exceeds the effective envelope, a subset of honest users is physically excluded regardless of willingness to pay. Against subsidized attackers, cost-based deterrence is weaker still.
+Fee bidding cannot include weight that does not fit in the window. Once required enforcement weight exceeds the effective envelope, a subset of honest users is physically excluded regardless of willingness to pay. Against subsidized attackers, cost-based deterrence is weaker still.
 \end{remark}
 
 \begin{itemize}
 \item \textbf{Trade-off:} There is no unlimited unilateral scaling. Increasing $N$ requires increasing $W'$, increasing $\rho$, lowering $e$, or accepting cooperative/operator-mediated assumptions.
-\item \textbf{Settlement Delay:} Multi-week windows support more users, but the user holds a delayed claim rather than fast-settling money.
-\item \textbf{Unique Footprint:} A claim of zero marginal unilateral exit bytes must specify how each user gets a spendable Layer~1 claim without an operator.
+\item \textbf{Settlement Delay:} Multi-week windows support more exit units, but the claimant holds a delayed claim rather than fast-settling money.
+\item \textbf{Unique Footprint:} A claim of zero marginal unilateral exit weight must specify how each exit unit secures an operator-independent Layer~1 claim without an operator.
 \end{itemize}
 
 \section{Limitations and Scope}
-This work states a \emph{static} byte-accounting bound: a necessary condition for scheduling unilateral enforcement weight inside $W'$ under explicit relay, topology, and efficiency assumptions. It is not a full mempool simulator, an equilibrium model of fees, or a proof about average-case payment throughput.
+This work states a \emph{static} block-weight accounting bound: a necessary condition for scheduling unilateral enforcement weight inside $W'$ under explicit relay, topology, and efficiency assumptions. It is not a full mempool simulator, an equilibrium model of fees, or a proof about average-case payment throughput.
 \begin{itemize}
     \itemsep0em
-    \item \textbf{Cooperation vs. unilateral paths.} Cooperative closes, liquidity swaps, watchtowers, LSP recovery flows, and custodial or operator-mediated exits may reduce observed contention. They are outside the unilateral envelope unless each user can still force a spendable Layer~1 claim alone.
+    \item \textbf{Cooperation vs. unilateral paths.} Cooperative closes, liquidity swaps, watchtowers, LSP recovery flows, and custodial or operator-mediated exits may reduce observed contention. They are outside the unilateral envelope unless each exit unit can still secure an operator-independent Layer~1 claim alone.
     \item \textbf{$\rho$ endogeneity.} Treating $\rho$ as an independent knob understates coupling near saturation: congestion increases replacement volume, pinning exposure, and fee-bump competition precisely when exits concentrate.
-    \item \textbf{Policy evolution.} TRUC, package relay, ephemeral anchors, and cluster mempool change which packages are admissible and how many bytes are lost. They do not remove $\sum_i N_i e_i \le \rho C_{\max}(W')$ for a simultaneous cohort with positive unilateral footprints.
+    \item \textbf{Policy evolution.} TRUC, package relay, ephemeral anchors, and cluster mempool change which packages are admissible and how much weight is stranded or excluded. They do not remove $\sum_i N_i e_i \le \rho C_{\max}(W')$ for a simultaneous cohort with positive unilateral footprints.
     \item \textbf{Instantiations.} Lightning weights are a declared reference profile derived from BOLT~3 expected weights plus operational margins. Ark-like and operator-assisted examples are template substitutions until a concrete deployment supplies its own witness path and timing assumptions.
     \item \textbf{Empirical rows.} Scenario tables are reproducible arithmetic from Equation~\eqref{eq:nmax}; they are not claims about measured global network occupancy unless separately sourced.
 \end{itemize}
@@ -353,6 +364,9 @@ IEEE ICBC, 2023. \url{https://arxiv.org/abs/2208.01908}
 
 \bibitem{core28} Bitcoin Core Developers.
 \emph{Bitcoin Core 28.0 Release Notes}. 2024. \url{https://bitcoincore.org/en/releases/28.0/}
+
+\bibitem{core31} Bitcoin Core Developers.
+\emph{Bitcoin Core 31.0 Release Notes}. 2026. \url{https://bitcoincore.org/en/releases/31.0/}
 
 \bibitem{packagepolicy} Bitcoin Core Developers.
 \emph{Package Mempool Accept Policy}. \url{https://github.com/bitcoin/bitcoin/blob/master/doc/policy/packages.md}

@@ -7,7 +7,6 @@ export interface LossInputs {
   wCoinbase?: number
   replaced?: number
   orphan?: number
-  dust?: number
   policy?: number
   other?: number
 }
@@ -19,7 +18,7 @@ export interface WeightBucket {
 
 export const defaultCoinbaseWeight = 2_000
 
-/** Lightning per-user enforcement weight (wu) — declared paper reference profile. */
+/** Lightning per-exit-unit enforcement weight (wu) — declared paper reference profile. */
 export const LN_WEIGHT_WU = {
   idle: 2_360,
   active: 5_848,
@@ -28,8 +27,8 @@ export const LN_WEIGHT_WU = {
 export const ARK_WEIGHT_PER_USER_WU = 3_200
 
 /**
- * Illustrative single-user enforcement weight (wu) for operator-assisted deferred-settlement stacks.
- * Not a protocol specification — substitute measured footprints when reviewing a concrete design.
+ * Template single-exit-unit enforcement weight (wu) for operator-assisted deferred-settlement stacks.
+ * Not a protocol specification — substitute measured transaction traces when reviewing a concrete design.
  */
 export const OPERATOR_ASSISTED_ILLUSTRATIVE_WEIGHT_WU = 3_400
 
@@ -106,31 +105,30 @@ export function blendedWeight(buckets: WeightBucket[]): number {
   return numerator / denominator
 }
 
-/** Estimate observed rho from an explicit loss decomposition. This is methodology, not theorem input. */
+/** Estimate observed rho from admission/inclusion losses. Economic dust belongs in the viability test. */
 export function rhoFromLosses({
   windowBlocks,
   wCoinbase = defaultCoinbaseWeight,
   replaced = 0,
   orphan = 0,
-  dust = 0,
   policy = 0,
   other = 0,
 }: LossInputs): number {
   if (windowBlocks <= 0) return 0
   const maxCapacity = cMax(windowBlocks, wCoinbase)
   if (maxCapacity === 0) return 0
-  const totalLoss = replaced + orphan + dust + policy + other
+  const totalLoss = replaced + orphan + policy + other
   return clampRho(1 - totalLoss / maxCapacity)
 }
 
 export function leadTimeBlocks(
-  users: number,
-  perUserWeight: number,
+  exitUnits: number,
+  perExitUnitWeight: number,
   rho: number,
   avgPerBlockCapacity: number,
 ): number {
-  if (users <= 0 || perUserWeight <= 0 || avgPerBlockCapacity <= 0) return 0
-  return (users * perUserWeight) / (clampRho(rho) * avgPerBlockCapacity)
+  if (exitUnits <= 0 || perExitUnitWeight <= 0 || avgPerBlockCapacity <= 0) return 0
+  return (exitUnits * perExitUnitWeight) / (clampRho(rho) * avgPerBlockCapacity)
 }
 
 export type SecurityZone = 'safe' | 'probabilistic' | 'insolvent'
@@ -149,7 +147,7 @@ export function fastExitEnvelopeThresholds(wCoinbase: number = defaultCoinbaseWe
   }
 }
 
-/** ρ stress vs best-case at the same per-user weight and window — bands for the interactive toy. */
+/** ρ stress vs best-case at the same per-exit-unit weight and window — bands for the interactive toy. */
 export function securitySlopeBandsSameE(
   windowBlocks: number,
   perUserWeight: number,
@@ -193,4 +191,4 @@ export function classifyFastExitEnvelope(
   )
 }
 
-export const TOY_VERSION = '1.10.0'
+export const TOY_VERSION = '1.10.3'

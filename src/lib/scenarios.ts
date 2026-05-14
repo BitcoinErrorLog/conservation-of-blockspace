@@ -28,7 +28,7 @@ export interface Scenario {
 
 export interface ScenarioMetrics {
   effectiveWeight: number
-  maxUsers: number
+  maxExitUnits: number
 }
 
 /** @deprecated Use LN_WEIGHT_WU from ./math — kept for preset readability */
@@ -41,7 +41,7 @@ export const OPERATOR_ASSISTED_ILLUSTRATIVE_WEIGHT = OPERATOR_ASSISTED_ILLUSTRAT
 export const SCENARIOS: Scenario[] = [
   {
     id: 'layer-benchmark',
-    name: '14-Day Layer Benchmark',
+    name: 'Lightning 14-day active',
     description: 'Main cross-layer benchmark: 2016-block window, Lightning HTLC-stress profile',
     rho: 0.8,
     windowBlocks: LAYER_BENCHMARK_WINDOW_BLOCKS,
@@ -71,7 +71,7 @@ export const SCENARIOS: Scenario[] = [
   },
   {
     id: 'slow-settlement',
-    name: '28-Day Slow Settlement',
+    name: 'Lightning 28-day active',
     description: 'Slow-settlement runway: 4032-block window, Lightning HTLC-stress profile',
     rho: 0.8,
     windowBlocks: SLOW_SETTLEMENT_WINDOW_BLOCKS,
@@ -81,7 +81,7 @@ export const SCENARIOS: Scenario[] = [
   },
   {
     id: 'layer-benchmark-idle',
-    name: '14-Day Idle Lightning',
+    name: 'Lightning 14-day idle',
     description: '2016-block window, idle Lightning profile',
     rho: 0.8,
     windowBlocks: LAYER_BENCHMARK_WINDOW_BLOCKS,
@@ -96,8 +96,8 @@ export const SCENARIOS: Scenario[] = [
   },
   {
     id: 'ark-layer-benchmark',
-    name: 'Ark-style (14 Days)',
-    description: 'Illustrative Ark-style timeout tree with 14-day window',
+    name: 'Ark 14-day',
+    description: 'Ark-style template with 14-day window; substitute a measured timeout path',
     rho: 0.8,
     windowBlocks: LAYER_BENCHMARK_WINDOW_BLOCKS,
     cohorts: [
@@ -111,8 +111,8 @@ export const SCENARIOS: Scenario[] = [
   },
   {
     id: 'ark-slow-settlement',
-    name: 'Ark-style (28 Days)',
-    description: 'Illustrative Ark-style timeout tree with 28-day window',
+    name: 'Ark 28-day',
+    description: 'Ark-style template with 28-day window; substitute a measured timeout path',
     rho: 0.8,
     windowBlocks: SLOW_SETTLEMENT_WINDOW_BLOCKS,
     cohorts: [
@@ -126,15 +126,15 @@ export const SCENARIOS: Scenario[] = [
   },
   {
     id: 'operator-layer-benchmark',
-    name: 'Operator-assisted (14 Days)',
+    name: 'Operator-assisted 14-day',
     description:
-      'Illustrative operator-assisted stack: substitute measured per-user enforcement weight for your design',
+      'Operator-assisted template: substitute measured transaction traces and per-exit-unit enforcement weight for your design',
     rho: 0.8,
     windowBlocks: LAYER_BENCHMARK_WINDOW_BLOCKS,
     cohorts: [
       {
         id: 'operator-exit',
-        label: 'Illustrative per-user L1 footprint',
+        label: 'Template per-exit-unit L1 footprint',
         perUserWeight: OPERATOR_ASSISTED_ILLUSTRATIVE_WEIGHT_WU,
         share: 1,
       },
@@ -142,14 +142,14 @@ export const SCENARIOS: Scenario[] = [
   },
   {
     id: 'operator-slow-settlement',
-    name: 'Operator-assisted (28 Days)',
-    description: 'Same illustrative weight with a slow-settlement window',
+    name: 'Operator-assisted 28-day',
+    description: 'Operator-assisted template with a slow-settlement window',
     rho: 0.8,
     windowBlocks: SLOW_SETTLEMENT_WINDOW_BLOCKS,
     cohorts: [
       {
         id: 'operator-exit',
-        label: 'Illustrative per-user L1 footprint',
+        label: 'Template per-exit-unit L1 footprint',
         perUserWeight: OPERATOR_ASSISTED_ILLUSTRATIVE_WEIGHT_WU,
         share: 1,
       },
@@ -171,8 +171,8 @@ export function scenarioEffectiveWeight(scenario: Scenario): number {
 
 export function scenarioMetrics(scenario: Scenario): ScenarioMetrics {
   const effectiveWeight = scenarioEffectiveWeight(scenario)
-  const maxUsers = nMax(scenario.rho, scenario.windowBlocks, effectiveWeight, scenario.wCoinbase)
-  return { effectiveWeight, maxUsers }
+  const maxExitUnits = nMax(scenario.rho, scenario.windowBlocks, effectiveWeight, scenario.wCoinbase)
+  return { effectiveWeight, maxExitUnits }
 }
 
 export const SCENARIO_QUERY_KEY = 'scenario'

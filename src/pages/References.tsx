@@ -1,11 +1,23 @@
 export function References() {
   return (
-    <article className="page">
-      <h1>References &amp; further reading</h1>
-      <p className="lead">
-        Primary sources for the paper, grouped by what they support.
-      </p>
+    <article className="page page-stack">
+      <section className="heading-group">
+        <h1>References &amp; further reading</h1>
+        <p className="lead">
+          Primary sources for the paper, grouped by what they support.
+        </p>
+      </section>
 
+      <section className="heading-group">
+        <h2>Conceptual frame</h2>
+        <p>
+          These references support the narrow technical claim: off-chain systems can improve the cooperative
+          path, but unilateral settlement still consumes finite Bitcoin blockspace. Read protocol throughput
+          claims separately from fallback enforcement claims.
+        </p>
+      </section>
+
+      <section className="section-stack">
       <h2>Layer and protocol sources</h2>
       <ul>
         <li>
@@ -32,7 +44,9 @@ export function References() {
           Robin Linus, <a href="https://bitvm.org/bitvm.pdf">BitVM: Compute Anything on Bitcoin</a>.
         </li>
       </ul>
+      </section>
 
+      <section className="section-stack">
       <h2>Lightning security and mass-exit work</h2>
       <ul>
         <li>
@@ -54,7 +68,9 @@ export function References() {
           </a>.
         </li>
       </ul>
+      </section>
 
+      <section className="section-stack">
       <h2>Mempool, relay, and policy references</h2>
       <ul>
         <li>
@@ -62,6 +78,9 @@ export function References() {
         </li>
         <li>
           Bitcoin Core Developers, <a href="https://bitcoincore.org/en/releases/28.0/">Bitcoin Core 28.0 Release Notes</a>.
+        </li>
+        <li>
+          Bitcoin Core Developers, <a href="https://bitcoincore.org/en/releases/31.0/">Bitcoin Core 31.0 Release Notes</a>.
         </li>
         <li>
           Bitcoin Core Developers,{' '}
@@ -76,7 +95,9 @@ export function References() {
           </a>.
         </li>
       </ul>
+      </section>
 
+      <section className="section-stack">
       <h2>Reproducibility</h2>
       <ul>
         <li>
@@ -101,6 +122,7 @@ export function References() {
           intermediate results before being treated as measured claims.
         </li>
       </ul>
+      </section>
     </article>
   )
 }
