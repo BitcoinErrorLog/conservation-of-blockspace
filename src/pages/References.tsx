@@ -101,7 +101,7 @@ export function References() {
       <h2>Reproducibility</h2>
       <ul>
         <li>
-          <a href={`${import.meta.env.BASE_URL}blockspace-conservation-may-2026.pdf?v=1.10.3`}>
+          <a href={`${import.meta.env.BASE_URL}blockspace-conservation-may-2026-v1.10.3.pdf`}>
             Download the compiled paper PDF
           </a>.
         </li>

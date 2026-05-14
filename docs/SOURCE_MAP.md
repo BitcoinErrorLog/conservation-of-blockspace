@@ -10,7 +10,7 @@ Use this index to navigate the standalone paper, interactive toy, tests, and dep
 | [`scripts/numerics.mjs`](../scripts/numerics.mjs) | Reproduces the 1-day / 14-day / 28-day window tables from the paper (Node, no deps) |
 | [`blockspace-conservation-audit-may-2026.md`](../blockspace-conservation-audit-may-2026.md) | Audit memo that drove the v1.9 proof, citation, and site consistency revision |
 | [`scripts/prepare-public.mjs`](../scripts/prepare-public.mjs) | Copies TeX/memo assets and compiles `public/blockspace-conservation-may-2026.pdf` when Tectonic is available |
-| [`public/blockspace-conservation-may-2026.pdf`](../public/blockspace-conservation-may-2026.pdf) | Browser-readable/downloadable compiled paper |
+| [`public/blockspace-conservation-may-2026-v1.10.3.pdf`](../public/blockspace-conservation-may-2026-v1.10.3.pdf) | Browser-readable/downloadable compiled paper |
 
 ## Interactive toy (Vite + React)
 

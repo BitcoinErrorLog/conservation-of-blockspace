@@ -1,7 +1,7 @@
 export function Paper() {
   const base = import.meta.env.BASE_URL || '/'
   const texHref = `${base}blockspace-conservation-may-2026.tex`
-  const pdfHref = `${base}blockspace-conservation-may-2026.pdf?v=1.10.3`
+  const pdfHref = `${base}blockspace-conservation-may-2026-v1.10.3.pdf`
 
   return (
     <article className="page page-stack">
